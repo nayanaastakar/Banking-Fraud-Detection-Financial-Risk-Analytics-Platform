@@ -1,9 +1,8 @@
-# Banking Fraud Detection & Financial Risk Analytics Platform
+# Banking Fraud Detection & Financial Risk Analytics | Python, Pandas, MySQL, SQL, Power BI
 
-> **Banking Fraud Detection & Financial Risk Analytics | Python, Pandas, MySQL, SQL, Power BI**
-> - Developed a transaction analytics solution to analyse suspicious patterns and financial risk indicators.
-> - Used Python, Pandas, and SQL to process, clean, and validate transaction data for financial risk analysis.
-> - Created a Power BI dashboard to report transaction trends, suspicious activity indicators, and financial risk metrics.
+• Developed a transaction analytics solution to analyse suspicious patterns and financial risk indicators.  
+• Used Python, Pandas, and SQL to process, clean, and validate transaction data for financial risk analysis.  
+• Created a Power BI dashboard to report transaction trends, suspicious activity indicators, and financial risk metrics.
 
 ---
 
