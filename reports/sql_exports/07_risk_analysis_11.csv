@@ -1,0 +1,5 @@
+model_name,run_timestamp,training_dataset_size,validation_dataset_size,decision_threshold,precision_value,recall_value,f1_value,average_precision_value,roc_auc_value
+logistic_regression,2026-10-30 23:24:31,227845,56962,0.7000,0.109202,0.908163,0.194962,0.725476,0.972549
+random_forest,2026-10-30 23:24:31,227845,56962,0.7000,0.876404,0.795918,0.834225,0.848905,0.976671
+random_forest,2026-10-30 20:38:17,283726,56745,0.7000,0.945205,0.726316,0.821429,0.806106,0.956908
+logistic_regression,2026-10-30 20:36:10,283726,56745,0.7000,0.107932,0.873684,0.192130,0.692513,0.975827

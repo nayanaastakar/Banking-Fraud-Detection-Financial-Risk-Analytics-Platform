@@ -1,0 +1,4 @@
+time_bucket,avg_amount,avg_fraud_amount
+0-1h,65.2137,264.5000
+1-2h,65.9935,149.4650
+2h+,88.9813,123.1630

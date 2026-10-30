@@ -1,0 +1,4 @@
+amount_band,fraud_rate,total_transactions
+high,0.3109,22839
+low,0.1547,188810
+medium,0.1526,72077

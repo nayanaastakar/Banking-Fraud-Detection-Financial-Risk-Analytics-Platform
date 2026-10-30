@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finguard-fraud-risk-analytics"
+version = "0.1.0"
+description = "FinGuard data science and analytics project for fraud detection and risk analysis."
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = [
+  "pandas>=2.2.0",
+  "numpy>=1.26.0",
+  "matplotlib>=3.8.0",
+  "seaborn>=0.13.0",
+  "scikit-learn>=1.4.0",
+  "joblib>=1.3.0",
+  "PyYAML>=6.0.0",
+  "python-dotenv>=1.0.1",
+  "mysql-connector-python>=9.0.0",
+  "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

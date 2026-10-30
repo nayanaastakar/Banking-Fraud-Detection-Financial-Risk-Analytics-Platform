@@ -1,0 +1,5 @@
+time_band,total_transactions,fraud_count,fraud_rate
+2-3h,1573,21,1.3350
+3h+,276009,448,0.1623
+1-2h,2213,2,0.0904
+0-1h,3931,2,0.0509

@@ -1,0 +1,4 @@
+time_window,fraud_rate
+2h+,0.1690
+1-2h,0.0904
+0-1h,0.0509

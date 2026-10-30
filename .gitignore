@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment and sensitive credentials
+.env
+.env.local
+query
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Raw dataset files (large files > 100MB)
+data/raw/*.csv
+data/processed/*.csv
+data/exports/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/exports/.gitkeep
+
+# Model binary weights (large files)
+models/*.joblib
+models/*.pkl
+models/*.bin
+!models/.gitkeep
+
+# Local IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# MySQL local dump files
+*.sql.gz

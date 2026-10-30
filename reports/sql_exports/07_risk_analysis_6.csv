@@ -1,0 +1,5 @@
+amount_bucket,time_bucket,total_count,fraud_count,fraud_rate
+high,early,1699,3,0.1766
+low,early,4445,1,0.0225
+low,later,184365,291,0.1578
+high,later,93217,178,0.1910
