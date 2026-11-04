@@ -43,6 +43,20 @@
 
 ---
 
+## 🔍 Data Integrity & Record Reconciliation Audit
+
+Every record across the ingestion pipeline, MySQL database, and prediction tables has been audited with zero variance:
+
+| Layer / Stage | Total Records | Legitimate (Class 0) | Fraud (Class 1) | Financial Volume | Integrity Status |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **Raw Source Dataset** (`creditcard.csv`) | 284,807 | 284,315 | 492 | — | 1,081 duplicate rows detected |
+| **Processed Feature Store** (`creditcard_processed.csv`) | 284,807 | 284,315 | 492 | — | 3 derived features engineered |
+| **MySQL `transactions` Table** | **283,726** | **283,253** | **473** | **\$25,102,001.68** | 100% unique hash deduplicated |
+| **Predictions — Random Forest** | 283,726 | 283,253 | 473 | — | 447 TP \| 36 FP \| 283,217 TN \| 26 FN |
+| **Predictions — Logistic Regression** | 283,726 | 283,253 | 473 | — | 426 TP \| 3,310 FP \| 279,943 TN \| 47 FN |
+
+---
+
 ## 🏗️ Architecture & Pipeline Flow
 
 ```mermaid

@@ -46,3 +46,10 @@
 |---|:---:|---:|---:|---:|---:|---:|---:|---:|
 | **Logistic Regression** | 0.70 | 0.1079 | 0.8737 | 0.1921 | 0.9879 | 0.0121 | 0.9758 | 0.6925 |
 | **Random Forest** | 0.70 | 0.9452 | 0.7263 | 0.8214 | 0.9999 | 0.00007 | 0.9569 | 0.8061 |
+
+## Verified record reconciliation audit
+
+- **Raw Kaggle Source:** 284,807 total rows (284,315 legitimate, 492 fraud, 1,081 duplicate hash rows).
+- **Processed Dataset:** 284,807 rows with 34 engineered columns.
+- **MySQL `transactions` Table:** 283,726 unique rows (283,253 legitimate, 473 fraud) with total monetary volume of $25,102,001.68 and $58,591.39 fraud exposure.
+- **MySQL `transaction_predictions` Table:** 283,726 predictions per model (567,452 total rows) with zero orphan keys and composite unique constraint `uq_prediction_transaction_model`.
