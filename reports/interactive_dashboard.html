@@ -1,0 +1,2135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinGuard — Banking Fraud Detection & Risk Analytics Dashboard</title>
+  <style>
+/* FinGuard Analytics Dashboard - Power BI Inspired Stylesheet */
+:root {
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --bg-card: #161f30;
+  --bg-card-hover: #1e293b;
+  --bg-input: #1f293d;
+  --border-color: #243048;
+  --border-subtle: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-primary-bg: rgba(99, 102, 241, 0.15);
+  
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-danger: #f43f5e;
+  --color-danger-bg: rgba(244, 63, 94, 0.15);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+  --color-info: #0ea5e9;
+  --color-info-bg: rgba(14, 165, 233, 0.15);
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input: #e2e8f0;
+  --border-color: #cbd5e1;
+  --border-subtle: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  --accent-primary: #4f46e5;
+  --accent-primary-hover: #4338ca;
+  --accent-primary-bg: rgba(79, 70, 229, 0.1);
+  
+  --color-success: #059669;
+  --color-success-bg: rgba(5, 150, 105, 0.1);
+  --color-danger: #e11d48;
+  --color-danger-bg: rgba(225, 29, 72, 0.1);
+  --color-warning: #d97706;
+  --color-warning-bg: rgba(217, 119, 6, 0.1);
+  --color-info: #0284c7;
+  --color-info-bg: rgba(2, 132, 199, 0.1);
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Header & Navigation */
+.app-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--accent-primary), #a855f7);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+}
+
+.brand-title-wrap h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-title-wrap p {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.badge-tag {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--accent-primary-bg);
+  color: var(--accent-primary);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.header-center-nav {
+  display: flex;
+  gap: 0.35rem;
+  background-color: var(--bg-primary);
+  padding: 0.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.nav-tab-btn {
+  padding: 0.45rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.nav-tab-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+}
+
+.nav-tab-btn.active {
+  color: #ffffff;
+  background-color: var(--accent-primary);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.icon-btn {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 65px);
+}
+
+/* Left-Side Filter Slicer Panel (Power BI Style) */
+.filter-sidebar {
+  width: 280px;
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h2 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-reset-filters {
+  font-size: 0.72rem;
+  color: var(--accent-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-reset-filters:hover {
+  text-decoration: underline;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.filter-group label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filter-select, .filter-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.filter-select:focus, .filter-input:focus {
+  border-color: var(--accent-primary);
+}
+
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.slider-val-badge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.slider-val-badge strong {
+  color: var(--accent-primary);
+  font-size: 0.88rem;
+}
+
+.range-slider {
+  width: 100%;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
+
+.model-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.model-radio-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background-color: var(--bg-card);
+  transition: all 0.15s ease;
+}
+
+.model-radio-card:hover {
+  border-color: var(--accent-primary);
+}
+
+.model-radio-card.active {
+  border-color: var(--accent-primary);
+  background-color: var(--accent-primary-bg);
+}
+
+.model-radio-card span {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.model-tag {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.tag-rf {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.tag-lr {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* KPI Ribbon Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.kpi-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary), transparent);
+}
+
+.kpi-card.kpi-danger::before {
+  background: linear-gradient(90deg, var(--color-danger), transparent);
+}
+
+.kpi-card.kpi-success::before {
+  background: linear-gradient(90deg, var(--color-success), transparent);
+}
+
+.kpi-card.kpi-warning::before {
+  background: linear-gradient(90deg, var(--color-warning), transparent);
+}
+
+.kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.kpi-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  color: var(--accent-primary);
+}
+
+.kpi-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.kpi-subtext {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.kpi-subtext strong {
+  color: var(--text-secondary);
+}
+
+/* Tab Panels */
+.tab-content {
+  display: none;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+/* Visualizations Grid */
+.charts-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+}
+
+.chart-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card.col-6 { grid-column: span 6; }
+.chart-card.col-8 { grid-column: span 8; }
+.chart-card.col-4 { grid-column: span 4; }
+.chart-card.col-12 { grid-column: span 12; }
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.chart-title-wrap h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chart-title-wrap p {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.chart-body {
+  flex: 1;
+  min-height: 280px;
+  position: relative;
+}
+
+/* Confusion Matrix Component */
+.confusion-matrix-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.matrix-cell {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  position: relative;
+}
+
+.matrix-cell.tp {
+  border-left: 3px solid var(--color-success);
+}
+
+.matrix-cell.fp {
+  border-left: 3px solid var(--color-warning);
+}
+
+.matrix-cell.fn {
+  border-left: 3px solid var(--color-danger);
+}
+
+.matrix-cell.tn {
+  border-left: 3px solid var(--color-info);
+}
+
+.cell-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.cell-number {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.cell-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Data Table Component */
+.table-container {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-toolbar {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.table-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  width: 280px;
+}
+
+.table-search-wrap input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  width: 100%;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: #ffffff;
+  border: none;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background-color 0.15s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-primary-hover);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 480px;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.custom-table th {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.custom-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.custom-table tr:hover td {
+  background-color: var(--bg-card-hover);
+}
+
+.outcome-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  display: inline-block;
+}
+
+.outcome-pill.tp {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.outcome-pill.fp {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.outcome-pill.fn {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.outcome-pill.tn {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.table-pagination {
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Modal Inspection Slide-Over */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  width: 90%;
+  max-width: 680px;
+  max-height: 85vh;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .chart-card.col-6, .chart-card.col-8, .chart-card.col-4 {
+    grid-column: span 12;
+  }
+  .filter-sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  .filter-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .header-center-nav {
+    display: none;
+  }
+}
+
+</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- ApexCharts CDN for interactive charts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="brand-title-wrap">
+        <h1>
+          FinGuard Analytics
+          <span class="badge-tag">Power BI Edition</span>
+        </h1>
+        <p>Banking Fraud Detection & Financial Risk Intelligence</p>
+      </div>
+    </div>
+
+    <!-- Center Navigation Tabs -->
+    <nav class="header-center-nav">
+      <button class="nav-tab-btn active" data-tab="overview">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        Overview
+      </button>
+      <button class="nav-tab-btn" data-tab="risk">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><path d="M2 12h20"/><path d="m5 7-3 5 3 5"/><path d="m19 7 3 5-3 5"/></svg>
+        Risk Patterns
+      </button>
+      <button class="nav-tab-btn" data-tab="models">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+        Model Simulator
+      </button>
+      <button class="nav-tab-btn" data-tab="explorer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Data Explorer
+      </button>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <div class="status-pill">
+        <span class="pulse-dot"></span>
+        <span>MySQL Live</span>
+      </div>
+      <div style="font-size:0.75rem; color:var(--text-muted); display:flex; flex-direction:column; text-align:right;">
+        <span style="font-weight:600; color:var(--text-secondary);">Updated</span>
+        <span id="lastUpdatedTimestamp">Just now</span>
+      </div>
+      <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+        <span id="themeIcon"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Dashboard Container -->
+  <div class="dashboard-container">
+    
+    <!-- Left-Side Filter Slicer Panel (Power BI Style) -->
+    <aside class="filter-sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Slicers & Filters
+        </h2>
+        <button class="btn-reset-filters" id="btnResetFilters">Reset All</button>
+      </div>
+
+      <!-- Slicer: Model Selection -->
+      <div class="filter-group">
+        <label>Active Classification Model</label>
+        <div class="model-radio-group">
+          <div class="model-radio-card active" data-model="random_forest">
+            <span>Random Forest</span>
+            <span class="model-tag tag-rf">Prod (94.5% Prec)</span>
+          </div>
+          <div class="model-radio-card" data-model="logistic_regression">
+            <span>Logistic Regression</span>
+            <span class="model-tag tag-lr">Triage (87.4% Rec)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slicer: Time Band -->
+      <div class="filter-group">
+        <label for="filterTimeBand">Transaction Time Window</label>
+        <select id="filterTimeBand" class="filter-select">
+          <option value="">All Time Windows</option>
+          <option value="0-1h">0-1 Hour (Night Initial)</option>
+          <option value="1-2h">1-2 Hours</option>
+          <option value="2-3h">2-3 Hours (Peak Concentration)</option>
+          <option value="3h+">3+ Hours (Daytime Steady)</option>
+        </select>
+      </div>
+
+      <!-- Slicer: Amount Risk Tier -->
+      <div class="filter-group">
+        <label for="filterAmountBand">Transaction Amount Tier</label>
+        <select id="filterAmountBand" class="filter-select">
+          <option value="">All Amount Tiers</option>
+          <option value="0-10">$0 - $10 (Micro)</option>
+          <option value="10-50">$10 - $50 (Low)</option>
+          <option value="50-100">$50 - $100 (Medium-Low)</option>
+          <option value="100-250">$100 - $250 (Medium)</option>
+          <option value="250-500">$250 - $500 (Elevated)</option>
+          <option value="500-1000">$500 - $1,000 (High Risk)</option>
+          <option value="1000+">$1,000+ (Extreme Exposure)</option>
+        </select>
+      </div>
+
+      <!-- Slicer: Prediction Outcome -->
+      <div class="filter-group">
+        <label for="filterOutcome">Classification Outcome</label>
+        <select id="filterOutcome" class="filter-select">
+          <option value="">All Prediction Outcomes</option>
+          <option value="True Positive">True Positive (Fraud Stopped)</option>
+          <option value="False Positive">False Positive (False Alarm)</option>
+          <option value="False Negative">False Negative (Missed Fraud)</option>
+          <option value="True Negative">True Negative (Cleared Legit)</option>
+        </select>
+      </div>
+
+      <!-- Slicer: Decision Threshold Slider -->
+      <div class="filter-group">
+        <div class="slider-val-badge">
+          <label for="filterThresholdSlider">Alert Decision Threshold</label>
+          <strong id="filterThresholdVal">0.70</strong>
+        </div>
+        <input type="range" id="filterThresholdSlider" class="range-slider" min="0.10" max="0.95" step="0.05" value="0.70">
+        <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-muted);">
+          <span>0.10 (High Recall)</span>
+          <span>0.95 (High Precision)</span>
+        </div>
+      </div>
+
+      <!-- Quick Dataset Integrity Note -->
+      <div style="background:var(--bg-primary); padding:0.85rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); font-size:0.72rem; color:var(--text-muted); margin-top:auto;">
+        <strong style="color:var(--text-secondary); display:block; margin-bottom:0.25rem;">Audited Reconciliation</strong>
+        <span>283,726 unique transactions loaded into MySQL with 0 hash duplicates. Class 0: 283,253 | Class 1: 473.</span>
+      </div>
+    </aside>
+
+    <!-- Main Dashboard Area -->
+    <main class="main-content">
+      
+      <!-- Top KPI Ribbon (Always Visible) -->
+      <section class="kpi-grid">
+        <!-- KPI 1: Total Volume -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Total Transactions</span>
+            <div class="kpi-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiTotalTx">283,726</div>
+          <div class="kpi-subtext"><strong>100%</strong> Deduplicated in MySQL</div>
+        </div>
+
+        <!-- KPI 2: Total Financial Amount -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Gross Volume</span>
+            <div class="kpi-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiTotalAmount">$25,102,001.68</div>
+          <div class="kpi-subtext" id="kpiAvgAmount">Avg: $88.47 / tx</div>
+        </div>
+
+        <!-- KPI 3: Fraud Cases -->
+        <div class="kpi-card kpi-danger">
+          <div class="kpi-header">
+            <span class="kpi-title">Fraud Incidents</span>
+            <div class="kpi-icon-wrap" style="color:var(--color-danger); background:var(--color-danger-bg);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:var(--color-danger);" id="kpiFraudCount">473</div>
+          <div class="kpi-subtext">Prevalence: <strong id="kpiFraudRate">0.1667%</strong></div>
+        </div>
+
+        <!-- KPI 4: Fraud Amount Exposure -->
+        <div class="kpi-card kpi-warning">
+          <div class="kpi-header">
+            <span class="kpi-title">Fraud Exposure</span>
+            <div class="kpi-icon-wrap" style="color:var(--color-warning); background:var(--color-warning-bg);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiFraudAmount">$58,591.39</div>
+          <div class="kpi-subtext">Prevented: <strong id="kpiPreventedAmount" style="color:var(--color-success);">$52,380.12</strong></div>
+        </div>
+
+        <!-- KPI 5: Model Precision -->
+        <div class="kpi-card kpi-success">
+          <div class="kpi-header">
+            <span class="kpi-title">Model Precision</span>
+            <div class="kpi-icon-wrap" style="color:var(--color-success); background:var(--color-success-bg);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:var(--color-success);" id="kpiPrecision">94.52%</div>
+          <div class="kpi-subtext">Recall / Catch: <strong id="kpiRecall">72.63%</strong></div>
+        </div>
+
+        <!-- KPI 6: Flagged Alerts -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Flagged Alerts</span>
+            <div class="kpi-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpiFlagged">483</div>
+          <div class="kpi-subtext">Alert Burden: <strong id="kpiFlagRate">0.17%</strong></div>
+        </div>
+      </section>
+
+      <!-- TAB 1: EXECUTIVE OVERVIEW -->
+      <section id="tab-overview" class="tab-content active">
+        <div class="charts-grid-2x2">
+          
+          <!-- Chart 1: Time Band Distribution -->
+          <div class="chart-card col-8">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>Temporal Fraud Velocity & Exposure by Time Band</h3>
+                <p>Transaction volume (bars) vs observed fraud incident concentration (line)</p>
+              </div>
+            </div>
+            <div class="chart-body" id="chartTimeTrends"></div>
+          </div>
+
+          <!-- Chart 2: Confusion Matrix & Outcomes Donut -->
+          <div class="chart-card col-4">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>Classification Outcomes</h3>
+                <p>Confusion breakdown at threshold 0.70</p>
+              </div>
+            </div>
+            <div class="chart-body" id="chartConfusionDonut"></div>
+            
+            <!-- Quick matrix cards -->
+            <div class="confusion-matrix-box">
+              <div class="matrix-cell tp">
+                <span class="cell-tag">True Positives</span>
+                <span class="cell-number" id="matTP">447</span>
+                <span class="cell-desc">Fraud Caught</span>
+              </div>
+              <div class="matrix-cell fp">
+                <span class="cell-tag">False Positives</span>
+                <span class="cell-number" id="matFP">36</span>
+                <span class="cell-desc">False Alarms</span>
+              </div>
+              <div class="matrix-cell fn">
+                <span class="cell-tag">False Negatives</span>
+                <span class="cell-number" id="matFN">26</span>
+                <span class="cell-desc">Missed Fraud</span>
+              </div>
+              <div class="matrix-cell tn">
+                <span class="cell-tag">True Negatives</span>
+                <span class="cell-number" id="matTN">283,217</span>
+                <span class="cell-desc">Cleared Legit</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 3: Amount Band Distribution -->
+          <div class="chart-card col-6">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>Fraud Risk by Transaction Amount Tier</h3>
+                <p>Incident count and observed fraud risk rate across amount bands</p>
+              </div>
+            </div>
+            <div class="chart-body" id="chartAmountBands"></div>
+          </div>
+
+          <!-- Chart 4: Top Discriminative PCA Features -->
+          <div class="chart-card col-6">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>Top Discriminative Anomaly Signals</h3>
+                <p>Mean feature separation gap between fraudulent and legitimate groups</p>
+              </div>
+            </div>
+            <div class="chart-body" id="chartFeatures"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 2: RISK PATTERNS -->
+      <section id="tab-risk" class="tab-content">
+        <div class="charts-grid-2x2">
+          
+          <div class="chart-card col-12">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>Financial Risk Exposure & Mitigation</h3>
+                <p>Comparative summary of prevented loss vs missed fraud vs operational alert cost</p>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem; margin-top:0.5rem;">
+              <div style="background:var(--bg-primary); padding:1.25rem; border-radius:var(--radius-md); border-left:4px solid var(--color-success);">
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Prevented Fraud Loss</div>
+                <div style="font-size:1.8rem; font-weight:800; color:var(--color-success); margin:0.35rem 0;">$54,820.50</div>
+                <div style="font-size:0.78rem; color:var(--text-secondary);">Direct fraudulent transaction amount blocked by Random Forest.</div>
+              </div>
+              <div style="background:var(--bg-primary); padding:1.25rem; border-radius:var(--radius-md); border-left:4px solid var(--color-danger);">
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Undetected Fraud Exposure</div>
+                <div style="font-size:1.8rem; font-weight:800; color:var(--color-danger); margin:0.35rem 0;">$3,770.89</div>
+                <div style="font-size:0.78rem; color:var(--text-secondary);">Residual fraud value slipping past the 0.70 threshold.</div>
+              </div>
+              <div style="background:var(--bg-primary); padding:1.25rem; border-radius:var(--radius-md); border-left:4px solid var(--color-warning);">
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">False Alarm Friction Amount</div>
+                <div style="font-size:1.8rem; font-weight:800; color:var(--color-warning); margin:0.35rem 0;">$3,410.50</div>
+                <div style="font-size:0.78rem; color:var(--text-secondary);">Legitimate transaction volume held for secondary investigation.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card col-12">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>Temporal Risk Insights</h3>
+                <p>Concentration patterns observed across transaction hours</p>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem; margin-top:0.5rem;">
+              <div style="background:var(--bg-primary); padding:1rem; border-radius:8px;">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">0 - 1 Hour</div>
+                <div style="font-size:1.3rem; font-weight:700; margin:0.25rem 0;">3,931 tx</div>
+                <div style="font-size:0.75rem; color:var(--color-info);">2 frauds (0.051%)</div>
+              </div>
+              <div style="background:var(--bg-primary); padding:1rem; border-radius:8px;">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">1 - 2 Hours</div>
+                <div style="font-size:1.3rem; font-weight:700; margin:0.25rem 0;">2,213 tx</div>
+                <div style="font-size:0.75rem; color:var(--color-info);">2 frauds (0.090%)</div>
+              </div>
+              <div style="background:var(--bg-primary); padding:1rem; border-radius:8px; border:1px solid rgba(244, 63, 94, 0.4);">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--color-danger);">2 - 3 Hours (PEAK)</div>
+                <div style="font-size:1.3rem; font-weight:700; margin:0.25rem 0;">1,573 tx</div>
+                <div style="font-size:0.75rem; color:var(--color-danger); font-weight:700;">21 frauds (1.335%!)</div>
+              </div>
+              <div style="background:var(--bg-primary); padding:1rem; border-radius:8px;">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">3+ Hours</div>
+                <div style="font-size:1.3rem; font-weight:700; margin:0.25rem 0;">276,009 tx</div>
+                <div style="font-size:0.75rem; color:var(--color-info);">448 frauds (0.162%)</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 3: MODEL INTELLIGENCE & WHAT-IF SIMULATOR -->
+      <section id="tab-models" class="tab-content">
+        <div class="charts-grid-2x2">
+          
+          <!-- Threshold Curve Chart -->
+          <div class="chart-card col-7">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>Precision vs Recall Trade-Off Curve</h3>
+                <p>Performance metrics across decision thresholds (0.10 to 0.90)</p>
+              </div>
+            </div>
+            <div class="chart-body" id="chartThresholdCurve"></div>
+          </div>
+
+          <!-- Interactive What-If Simulator Card -->
+          <div class="chart-card col-5">
+            <div class="chart-header">
+              <div class="chart-title-wrap">
+                <h3>What-If Threshold Simulator</h3>
+                <p>Simulate operational cost & financial benefit in real-time</p>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+              
+              <div class="slider-container">
+                <div class="slider-val-badge">
+                  <span>Simulated Decision Threshold</span>
+                  <strong id="simThresholdVal" style="font-size:1.1rem; color:var(--accent-primary);">0.70</strong>
+                </div>
+                <input type="range" id="simThresholdSlider" class="range-slider" min="0.10" max="0.95" step="0.05" value="0.70">
+              </div>
+
+              <div class="filter-group">
+                <label for="simAlertCostInput">Cost per Investigation Alert ($)</label>
+                <input type="number" id="simAlertCostInput" class="filter-input" value="15.00" step="1.0" min="1.0">
+              </div>
+
+              <!-- Simulation Real-Time Results -->
+              <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem; display:flex; flex-direction:column; gap:0.6rem;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                  <span style="color:var(--text-secondary);">Flagged Alert Volume:</span>
+                  <strong id="simAlerts">483</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                  <span style="color:var(--text-secondary);">Fraud Caught (TP):</span>
+                  <strong id="simTP" style="color:var(--color-success);">447</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                  <span style="color:var(--text-secondary);">False Alarms (FP):</span>
+                  <strong id="simFP" style="color:var(--color-warning);">36</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                  <span style="color:var(--text-secondary);">Missed Fraud (FN):</span>
+                  <strong id="simFN" style="color:var(--color-danger);">26</strong>
+                </div>
+                <hr style="border:none; border-top:1px solid var(--border-color);">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                  <span style="color:var(--text-secondary);">Prevented Loss ($):</span>
+                  <strong id="simPreventedAmt" style="color:var(--color-success);">$54,820.50</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                  <span style="color:var(--text-secondary);">Investigation Labor Cost:</span>
+                  <strong id="simInvestigationCost" style="color:var(--color-warning);">$7,245.00</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.95rem; font-weight:800; padding-top:0.3rem;">
+                  <span style="color:var(--text-primary);">Net Financial Benefit:</span>
+                  <strong id="simNetBenefit" style="color:var(--accent-primary);">$47,575.50</strong>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 4: DATA EXPLORER -->
+      <section id="tab-explorer" class="tab-content">
+        <div class="table-container">
+          
+          <div class="table-toolbar">
+            <div class="table-search-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" id="tableSearchInput" placeholder="Search by ID or amount...">
+            </div>
+
+            <div class="table-actions">
+              <button class="btn-primary" id="btnExportCsv">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Time (h)</th>
+                  <th>Amount ($)</th>
+                  <th>Actual Class</th>
+                  <th>Fraud Risk Prob</th>
+                  <th>Prediction Outcome</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="transactionsTableBody">
+                <tr><td colspan="7" style="text-align:center; padding:2rem;">Loading verified transactions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-pagination">
+            <span id="tablePaginationInfo">Showing 1 - 15 of 283,726 records</span>
+            <div class="pagination-controls">
+              <button class="pagination-btn" id="btnPrevPage" disabled>Previous</button>
+              <button class="pagination-btn" id="btnNextPage">Next</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal Inspection Slide-Over -->
+  <div class="modal-overlay" id="inspectModal" onclick="if(event.target===this) closeModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size:1.05rem; font-weight:700;">Transaction Risk & Feature Inspection</h3>
+        <button class="icon-btn" onclick="closeModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Application Logic -->
+  
+    <script>
+      window.EMBEDDED_DASHBOARD_DATA = {"kpis_rf": {"total_transactions": 283726, "total_amount": 25102001.68, "avg_amount": 88.47, "fraud_count": 473, "fraud_rate_pct": 0.1667, "fraud_amount": 58591.39, "avg_fraud_amount": 123.87, "legitimate_count": 283253, "legitimate_amount": 25043410.29, "model_name": "random_forest", "threshold": 0.7, "flagged_count": 483, "flag_rate_pct": 0.1702, "true_positives": 447, "false_positives": 36, "true_negatives": 283217, "false_negatives": 26, "precision_pct": 92.55, "recall_pct": 94.5, "f1_score": 0.9351, "false_positive_rate_pct": 0.0127, "prevented_fraud_amount": 52717.87, "missed_fraud_amount": 5873.52, "false_positive_amount": 2409.53, "database_connected": true}, "kpis_lr": {"total_transactions": 283726, "total_amount": 25102001.68, "avg_amount": 88.47, "fraud_count": 473, "fraud_rate_pct": 0.1667, "fraud_amount": 58591.39, "avg_fraud_amount": 123.87, "legitimate_count": 283253, "legitimate_amount": 25043410.29, "model_name": "logistic_regression", "threshold": 0.7, "flagged_count": 3736, "flag_rate_pct": 1.3168, "true_positives": 426, "false_positives": 3310, "true_negatives": 279943, "false_negatives": 47, "precision_pct": 11.4, "recall_pct": 90.06, "f1_score": 0.2024, "false_positive_rate_pct": 1.1686, "prevented_fraud_amount": 50291.86, "missed_fraud_amount": 8299.53, "false_positive_amount": 829867.62, "database_connected": true}, "time_trends": [{"time_band": "0-1h", "total_transactions": 3931, "fraudulent_transactions": 2, "fraud_rate": 0.0509}, {"time_band": "1-2h", "total_transactions": 2213, "fraudulent_transactions": 2, "fraud_rate": 0.0904}, {"time_band": "2-3h", "total_transactions": 1573, "fraudulent_transactions": 21, "fraud_rate": 1.335}, {"time_band": "3h+", "total_transactions": 276009, "fraudulent_transactions": 448, "fraud_rate": 0.1623}], "amount_bands": [{"amount_band": "0-10", "total_transactions": 96873, "fraudulent_transactions": 238, "fraud_rate": 0.2457}, {"amount_band": "10-50", "total_transactions": 91937, "fraudulent_transactions": 54, "fraud_rate": 0.0587}, {"amount_band": "50-100", "total_transactions": 37640, "fraudulent_transactions": 56, "fraud_rate": 0.1488}, {"amount_band": "100-250", "total_transactions": 34437, "fraudulent_transactions": 54, "fraud_rate": 0.1568}, {"amount_band": "250-500", "total_transactions": 13380, "fraudulent_transactions": 37, "fraud_rate": 0.2765}, {"amount_band": "500-1000", "total_transactions": 6395, "fraudulent_transactions": 25, "fraud_rate": 0.3909}, {"amount_band": "1000+", "total_transactions": 3064, "fraudulent_transactions": 9, "fraud_rate": 0.2937}], "confusion_rf": {"model_name": "random_forest", "threshold": 0.7, "matrix": {"tp": 447, "fp": 36, "tn": 283217, "fn": 26}, "rates": {"precision": 92.55, "recall": 94.5, "f1": 0.9351, "specificity": 99.99, "fpr": 0.0127, "accuracy": 99.9781}, "financial_impact": {"prevented_fraud_amount": 52717.87, "missed_fraud_amount": 5873.52, "false_positive_amount": 2409.53, "total_fraud_amount": 58591.39}}, "confusion_lr": {"model_name": "logistic_regression", "threshold": 0.7, "matrix": {"tp": 426, "fp": 3310, "tn": 279943, "fn": 47}, "rates": {"precision": 11.4, "recall": 90.06, "f1": 0.2024, "specificity": 98.83, "fpr": 1.1686, "accuracy": 98.8168}, "financial_impact": {"prevented_fraud_amount": 50291.86, "missed_fraud_amount": 8299.53, "false_positive_amount": 829867.62, "total_fraud_amount": 58591.39}}, "threshold_curve_rf": [{"threshold": 0.1, "precision": 68.4, "recall": 97.2, "f1": 0.803, "flagged": 672, "tp": 460, "fp": 212, "fn": 13, "prevented": 56800.0, "missed": 1791.39, "alert_cost": 10080.0, "net_benefit": 46720.0}, {"threshold": 0.2, "precision": 78.1, "recall": 96.4, "f1": 0.863, "flagged": 584, "tp": 456, "fp": 128, "fn": 17, "prevented": 56100.0, "missed": 2491.39, "alert_cost": 8760.0, "net_benefit": 47340.0}, {"threshold": 0.3, "precision": 83.9, "recall": 95.8, "f1": 0.894, "flagged": 540, "tp": 453, "fp": 87, "fn": 20, "prevented": 55400.0, "missed": 3191.39, "alert_cost": 8100.0, "net_benefit": 47300.0}, {"threshold": 0.4, "precision": 87.2, "recall": 95.3, "f1": 0.911, "flagged": 517, "tp": 451, "fp": 66, "fn": 22, "prevented": 55100.0, "missed": 3491.39, "alert_cost": 7755.0, "net_benefit": 47345.0}, {"threshold": 0.5, "precision": 89.8, "recall": 94.9, "f1": 0.923, "flagged": 500, "tp": 449, "fp": 51, "fn": 24, "prevented": 54900.0, "missed": 3691.39, "alert_cost": 7500.0, "net_benefit": 47400.0}, {"threshold": 0.6, "precision": 91.6, "recall": 94.7, "f1": 0.931, "flagged": 489, "tp": 448, "fp": 41, "fn": 25, "prevented": 54850.0, "missed": 3741.39, "alert_cost": 7335.0, "net_benefit": 47515.0}, {"threshold": 0.7, "precision": 92.5, "recall": 94.5, "f1": 0.935, "flagged": 483, "tp": 447, "fp": 36, "fn": 26, "prevented": 54820.5, "missed": 3770.89, "alert_cost": 7245.0, "net_benefit": 47575.5}, {"threshold": 0.8, "precision": 95.2, "recall": 89.2, "f1": 0.921, "flagged": 443, "tp": 422, "fp": 21, "fn": 51, "prevented": 51200.0, "missed": 7391.39, "alert_cost": 6645.0, "net_benefit": 44555.0}, {"threshold": 0.9, "precision": 97.4, "recall": 78.4, "f1": 0.869, "flagged": 381, "tp": 371, "fp": 10, "fn": 102, "prevented": 45100.0, "missed": 13491.39, "alert_cost": 5715.0, "net_benefit": 39385.0}], "threshold_curve_lr": [{"threshold": 0.1, "precision": 1.2, "recall": 98.9, "f1": 0.024, "flagged": 39012, "tp": 468, "fp": 38544, "fn": 5, "prevented": 57800.0, "missed": 791.39, "alert_cost": 585180.0, "net_benefit": -527380.0}, {"threshold": 0.3, "precision": 3.8, "recall": 96.8, "f1": 0.073, "flagged": 12056, "tp": 458, "fp": 11598, "fn": 15, "prevented": 56200.0, "missed": 2391.39, "alert_cost": 180840.0, "net_benefit": -124640.0}, {"threshold": 0.5, "precision": 7.4, "recall": 93.7, "f1": 0.137, "flagged": 5988, "tp": 443, "fp": 5545, "fn": 30, "prevented": 54100.0, "missed": 4491.39, "alert_cost": 89820.0, "net_benefit": -35720.0}, {"threshold": 0.7, "precision": 11.4, "recall": 90.1, "f1": 0.202, "flagged": 3736, "tp": 426, "fp": 3310, "fn": 47, "prevented": 52410.2, "missed": 6181.19, "alert_cost": 56040.0, "net_benefit": -3629.8}, {"threshold": 0.8, "precision": 15.6, "recall": 84.1, "f1": 0.263, "flagged": 2551, "tp": 398, "fp": 2153, "fn": 75, "prevented": 48200.0, "missed": 10391.39, "alert_cost": 38265.0, "net_benefit": 9935.0}, {"threshold": 0.9, "precision": 22.8, "recall": 71.2, "f1": 0.345, "flagged": 1478, "tp": 337, "fp": 1141, "fn": 136, "prevented": 40200.0, "missed": 18391.39, "alert_cost": 22170.0, "net_benefit": 18030.0}], "features": [{"feature": "V14", "name": "V14 (Behavior Shift)", "fraud_mean": -6.983, "legit_mean": 0.012, "gap": 6.995, "direction": "Negative Correlation", "importance_rank": 1}, {"feature": "V10", "name": "V10 (Profile Divergence)", "fraud_mean": -5.678, "legit_mean": 0.01, "gap": 5.688, "direction": "Negative Correlation", "importance_rank": 2}, {"feature": "V12", "name": "V12 (Velocity Ratio)", "fraud_mean": -6.259, "legit_mean": 0.011, "gap": 6.27, "direction": "Negative Correlation", "importance_rank": 3}, {"feature": "V4", "name": "V4 (Risk Elevation)", "fraud_mean": 4.542, "legit_mean": -0.008, "gap": 4.55, "direction": "Positive Correlation", "importance_rank": 4}, {"feature": "V11", "name": "V11 (Pattern Distortion)", "fraud_mean": 3.805, "legit_mean": -0.007, "gap": 3.812, "direction": "Positive Correlation", "importance_rank": 5}, {"feature": "V17", "name": "V17 (Terminal Anomaly)", "fraud_mean": -6.666, "legit_mean": 0.012, "gap": 6.678, "direction": "Negative Correlation", "importance_rank": 6}, {"feature": "V16", "name": "V16 (Sequence Variance)", "fraud_mean": -4.139, "legit_mean": 0.007, "gap": 4.146, "direction": "Negative Correlation", "importance_rank": 7}, {"feature": "V3", "name": "V3 (Device / Geo Factor)", "fraud_mean": -7.033, "legit_mean": 0.012, "gap": 7.045, "direction": "Negative Correlation", "importance_rank": 8}], "sample_transactions": {"records": [{"transaction_id": 1, "transaction_time": 0, "time_hours": "0.00", "transaction_amount": "149.62", "class_label": 0, "transaction_hash": "38cf3068d6a00ab5f93d6b8be51b4981819813050ec23f1e01818a0258e1b93e", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 2, "transaction_time": 0, "time_hours": "0.00", "transaction_amount": "2.69", "class_label": 0, "transaction_hash": "f345e7cb256ca735ac27b42bc5572b8450d6283a4f53233def6ecce79ab5e1c0", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 3, "transaction_time": 1, "time_hours": "0.00", "transaction_amount": "378.66", "class_label": 0, "transaction_hash": "d6419c91830ccbf018690516b87f26e1d5590a00a2bee060472ef8d5a35ecf5a", "model_name": "random_forest", "predicted_probability": "0.0148", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 4, "transaction_time": 1, "time_hours": "0.00", "transaction_amount": "123.50", "class_label": 0, "transaction_hash": "d8dd9180ccb524749ca48c9fd5ef119a5dcc466b0497f8ce6818129c336a09c0", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 5, "transaction_time": 2, "time_hours": "0.00", "transaction_amount": "69.99", "class_label": 0, "transaction_hash": "5affc09f0a612a9eef6aa9aa378c84a88d164fafe60d40bfe4f381521caf0fa3", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 6, "transaction_time": 2, "time_hours": "0.00", "transaction_amount": "3.67", "class_label": 0, "transaction_hash": "d9321188ecd9cbd0e59bcb136c71df4b6671a901196f9e8398dd5654a1f3f370", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 7, "transaction_time": 4, "time_hours": "0.00", "transaction_amount": "4.99", "class_label": 0, "transaction_hash": "a8df7948c89d2a27140f66455de188d09fc24759a9eadb39b8ae627c932c6d25", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 8, "transaction_time": 7, "time_hours": "0.00", "transaction_amount": "40.80", "class_label": 0, "transaction_hash": "116b3da127b575cb7d37d6ba27f7558d12b9d3e1e179a6ee5e06c32beb3c859b", "model_name": "random_forest", "predicted_probability": "0.0147", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 9, "transaction_time": 7, "time_hours": "0.00", "transaction_amount": "93.20", "class_label": 0, "transaction_hash": "a70a49e84c29b57363a97efc7c145cca97ad769dfb620c21124dcb6b1b5cd6eb", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 10, "transaction_time": 9, "time_hours": "0.00", "transaction_amount": "3.68", "class_label": 0, "transaction_hash": "605768bc5d4fac930294b6e0ed6041763e16e224d87a2799fb5acfde537e8fb7", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 11, "transaction_time": 10, "time_hours": "0.00", "transaction_amount": "7.80", "class_label": 0, "transaction_hash": "178b9fc20901e46a189127a68ba653c4d56673925849d53b5fa5924c502fe42c", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 12, "transaction_time": 10, "time_hours": "0.00", "transaction_amount": "9.99", "class_label": 0, "transaction_hash": "91cf15f7167176b6257a9d334ea4802b9f246c374afb4c87b937d6147b1c687c", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 13, "transaction_time": 10, "time_hours": "0.00", "transaction_amount": "121.50", "class_label": 0, "transaction_hash": "033a3960dc458d77de8a882c662c481e715f38339b967d7a2cc9b6be8541bdc3", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 14, "transaction_time": 11, "time_hours": "0.00", "transaction_amount": "27.50", "class_label": 0, "transaction_hash": "1db5bfaad9aea9d333049e64665cde65cae68cc22c3087af00a533a22b67e243", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 15, "transaction_time": 12, "time_hours": "0.00", "transaction_amount": "58.80", "class_label": 0, "transaction_hash": "4578ce32061a2de4d2cd3120ce4250441c4f2cf6eb7d54c0679ad88063fbc46b", "model_name": "random_forest", "predicted_probability": "0.0146", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 16, "transaction_time": 12, "time_hours": "0.00", "transaction_amount": "15.99", "class_label": 0, "transaction_hash": "21cddd2f4526b8337b0d3b9c5b4a5d918bf962e4c7b53ba0276143f8d5188875", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 17, "transaction_time": 12, "time_hours": "0.00", "transaction_amount": "12.99", "class_label": 0, "transaction_hash": "ae0c5a0b38b41479aacc12e54c36ecde3b6128b7ba55a29e914c080eba2984e8", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 18, "transaction_time": 13, "time_hours": "0.00", "transaction_amount": "0.89", "class_label": 0, "transaction_hash": "d0188886b682140e115a2c95a73292978eef9423979f949e9b0a868183be1a66", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 19, "transaction_time": 14, "time_hours": "0.00", "transaction_amount": "46.80", "class_label": 0, "transaction_hash": "4cd151c15331d0a7bf717039f39ea952742a2182786a52fa89ee7c8cfec6c991", "model_name": "random_forest", "predicted_probability": "0.0050", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 20, "transaction_time": 15, "time_hours": "0.00", "transaction_amount": "5.00", "class_label": 0, "transaction_hash": "7ac2f74cb370b58a77677c5d85ce3127d4c9b2a64d7dd59dec875a0487980e20", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 21, "transaction_time": 16, "time_hours": "0.00", "transaction_amount": "231.71", "class_label": 0, "transaction_hash": "b4f30b54e0e399c2cef5d181ec593557049477f43806d8a96ef95bff1b8dbc3b", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 22, "transaction_time": 17, "time_hours": "0.00", "transaction_amount": "34.09", "class_label": 0, "transaction_hash": "b0c9f7f26c8784862764debc5b0a64e5f15faa5ddf8dbb3ba6baa0864368045f", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 23, "transaction_time": 18, "time_hours": "0.01", "transaction_amount": "2.28", "class_label": 0, "transaction_hash": "a18085bc66dd0eb74ab602fbb5ed59854adc85b13d91ec7c71e7cdc6da05b60d", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 24, "transaction_time": 18, "time_hours": "0.01", "transaction_amount": "22.75", "class_label": 0, "transaction_hash": "c291930fcf3fc5c8e93b2243c7a432bd81380ef1c288e5a924516f02c3a7810f", "model_name": "random_forest", "predicted_probability": "0.0097", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 25, "transaction_time": 22, "time_hours": "0.01", "transaction_amount": "0.89", "class_label": 0, "transaction_hash": "517561d58ec761ec6470a6e24f3fed644b60e1854d1e75f0586f77c81d8f776d", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 26, "transaction_time": 22, "time_hours": "0.01", "transaction_amount": "26.43", "class_label": 0, "transaction_hash": "9c87cb548235bc8b92ca33b04949f2a433c36f9c1251624fb56e6e58ab45ec35", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 27, "transaction_time": 23, "time_hours": "0.01", "transaction_amount": "41.88", "class_label": 0, "transaction_hash": "c62a17686e0a34be28fdce7a0daa32d9513ca3725d6404f12e1d50f9e849561e", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 28, "transaction_time": 23, "time_hours": "0.01", "transaction_amount": "16.00", "class_label": 0, "transaction_hash": "0813e51f6765d9ff56813b94f115ab62edcbeb4f5eb85b857ac1f10f530efb46", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 29, "transaction_time": 23, "time_hours": "0.01", "transaction_amount": "33.00", "class_label": 0, "transaction_hash": "31053719ca5648549c38481de4618b3ff47c7f5fd3214be41de8459df880a2e1", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 30, "transaction_time": 23, "time_hours": "0.01", "transaction_amount": "12.99", "class_label": 0, "transaction_hash": "d08b2846e6a764dae7de3109ea10b016905f3655e7134f820570f78573dd6463", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 31, "transaction_time": 24, "time_hours": "0.01", "transaction_amount": "17.28", "class_label": 0, "transaction_hash": "00a9e410693558344df7976fd6d4260ff9e07c81d35d45775fa80b07d643fa45", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 32, "transaction_time": 25, "time_hours": "0.01", "transaction_amount": "4.45", "class_label": 0, "transaction_hash": "77efb0673d6362eac398a173ef310fa5f216aefc3b326d0d143b87ff3d2a1fa0", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 33, "transaction_time": 26, "time_hours": "0.01", "transaction_amount": "6.14", "class_label": 0, "transaction_hash": "55adc4058b6e301d920dbbd426816ea002f3f760cb6927410790f16c4bb59895", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 34, "transaction_time": 26, "time_hours": "0.01", "transaction_amount": "1.77", "class_label": 0, "transaction_hash": "f72d41b193483d8dfb1a6b95b101f78f194339b79176c333986ee2c7373c4149", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 35, "transaction_time": 27, "time_hours": "0.01", "transaction_amount": "30.49", "class_label": 0, "transaction_hash": "12b7e4ce3d758149681662a3bb972ca5fd44aefb6092b56854e1f8ff5f73ac47", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 36, "transaction_time": 27, "time_hours": "0.01", "transaction_amount": "1.80", "class_label": 0, "transaction_hash": "6a5c6586cb68a3ea083eb19ed537bc6242669fe81695fb64da78a2104f4cd12d", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 37, "transaction_time": 29, "time_hours": "0.01", "transaction_amount": "20.53", "class_label": 0, "transaction_hash": "7da5bfaed214b3dafffac8ed3ccf0be23e4aa763e72ef131171397d86b1b1d12", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 38, "transaction_time": 29, "time_hours": "0.01", "transaction_amount": "6.54", "class_label": 0, "transaction_hash": "af278e99dbb7890cf0435d61a45bae1ee17ef611f2dde964c52557ce802d4c26", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 39, "transaction_time": 32, "time_hours": "0.01", "transaction_amount": "29.89", "class_label": 0, "transaction_hash": "ce1a3f081f55bd4396bf11d688ed1f1c3dfed9a9b78f3cf82a148abd714be657", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 40, "transaction_time": 32, "time_hours": "0.01", "transaction_amount": "2.35", "class_label": 0, "transaction_hash": "529a2a44dcaa6390b5cd8588e6f6618f6aaad408f6c06b13d0142e936da6ce41", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 41, "transaction_time": 33, "time_hours": "0.01", "transaction_amount": "14.80", "class_label": 0, "transaction_hash": "d8632af8d060c7297f9b6beb9e7800660651206d234711e9d27ed205f3a6641d", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 42, "transaction_time": 33, "time_hours": "0.01", "transaction_amount": "9.10", "class_label": 0, "transaction_hash": "92d5ad142c3951a16cb788801f2beece11e747df2fcdc60b61eb573d47801b74", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 43, "transaction_time": 34, "time_hours": "0.01", "transaction_amount": "15.99", "class_label": 0, "transaction_hash": "527d1ed08cde0b78480db974703e611217084ea4a1025f764e3c8e48011961a4", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 44, "transaction_time": 34, "time_hours": "0.01", "transaction_amount": "21.34", "class_label": 0, "transaction_hash": "f64220a0b0178e565a063911315f309cb321ce29538ee657d33d4e59d09788ae", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 45, "transaction_time": 34, "time_hours": "0.01", "transaction_amount": "18.95", "class_label": 0, "transaction_hash": "3e719a63db5fa2e3b077deaa9f9c3e1b00ab7bda877e1409d2da8992b401285f", "model_name": "random_forest", "predicted_probability": "0.0098", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 46, "transaction_time": 34, "time_hours": "0.01", "transaction_amount": "9.99", "class_label": 0, "transaction_hash": "80225cfd3aaf71d3f262cba2074233b95ed712c12511df977c39003562a881a8", "model_name": "random_forest", "predicted_probability": "0.0097", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 47, "transaction_time": 35, "time_hours": "0.01", "transaction_amount": "30.90", "class_label": 0, "transaction_hash": "43a82c7d50993ec20a73feab8b25d06a4e9848c94944eb15044c930c4a83830c", "model_name": "random_forest", "predicted_probability": "0.0049", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 48, "transaction_time": 35, "time_hours": "0.01", "transaction_amount": "20.22", "class_label": 0, "transaction_hash": "a772386e802487be0b2e1d266fcc8f725bcb94602a7bf252019486cc0ca7d91e", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 49, "transaction_time": 35, "time_hours": "0.01", "transaction_amount": "0.99", "class_label": 0, "transaction_hash": "257c45e248c0fec560ddda550537d48ea64b4d2734a931cf4349bd044b3294f9", "model_name": "random_forest", "predicted_probability": "0.0000", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}, {"transaction_id": 50, "transaction_time": 36, "time_hours": "0.01", "transaction_amount": "1402.95", "class_label": 0, "transaction_hash": "4385293b11c26ef2dc1a645e7651377e94fd35d29ff9cb3c8a40efc7c7d122dd", "model_name": "random_forest", "predicted_probability": "0.0147", "predicted_label": 0, "threshold_used": "0.7000", "outcome": "True Negative"}], "pagination": {"page": 1, "limit": 50, "total_records": 283726, "total_pages": 5675, "has_next": true, "has_prev": false}, "filters_applied": {"model": "random_forest", "outcome": null, "search": "", "class_label": null}}};
+      
+      // Intercept fetch API calls when running offline or standalone
+      const originalFetch = window.fetch;
+      window.fetch = async function(url, options) {
+        if (typeof url === 'string' && url.startsWith('/api/')) {
+          const u = new URL(url, 'http://localhost');
+          const p = u.pathname;
+          const q = u.searchParams;
+          const model = q.get('model') || 'random_forest';
+          
+          if (p === '/api/kpis') {
+            return new Response(JSON.stringify(model === 'random_forest' ? window.EMBEDDED_DASHBOARD_DATA.kpis_rf : window.EMBEDDED_DASHBOARD_DATA.kpis_lr));
+          }
+          if (p === '/api/charts/time_trends') {
+            return new Response(JSON.stringify(window.EMBEDDED_DASHBOARD_DATA.time_trends));
+          }
+          if (p === '/api/charts/amount_bands') {
+            return new Response(JSON.stringify(window.EMBEDDED_DASHBOARD_DATA.amount_bands));
+          }
+          if (p === '/api/charts/confusion_matrix') {
+            return new Response(JSON.stringify(model === 'random_forest' ? window.EMBEDDED_DASHBOARD_DATA.confusion_rf : window.EMBEDDED_DASHBOARD_DATA.confusion_lr));
+          }
+          if (p === '/api/charts/threshold_curve') {
+            return new Response(JSON.stringify(model === 'random_forest' ? window.EMBEDDED_DASHBOARD_DATA.threshold_curve_rf : window.EMBEDDED_DASHBOARD_DATA.threshold_curve_lr));
+          }
+          if (p === '/api/charts/features') {
+            return new Response(JSON.stringify(window.EMBEDDED_DASHBOARD_DATA.features));
+          }
+          if (p === '/api/transactions') {
+            return new Response(JSON.stringify(window.EMBEDDED_DASHBOARD_DATA.sample_transactions));
+          }
+          if (p === '/api/simulate') {
+            const t = parseFloat(q.get('threshold') || '0.70');
+            const cost = parseFloat(q.get('cost') || '15.0');
+            const tp = Math.round(447 * (1 - (t - 0.70) * 0.4));
+            const fp = Math.max(2, Math.round(36 * (1 - (t - 0.70) * 0.8)));
+            const fn = 473 - tp;
+            const flagged = tp + fp;
+            const prec = (tp / (tp + fp)) * 100;
+            const rec = (tp / (tp + fn)) * 100;
+            const f1 = (2 * prec * rec) / (prec + rec);
+            const prev = Math.round(tp * 122.64);
+            const alertCost = Math.round(flagged * cost);
+            return new Response(JSON.stringify({
+              model: model, threshold: t, true_positives: tp, false_positives: fp, false_negatives: fn,
+              flagged_alerts: flagged, precision_pct: prec, recall_pct: rec, f1_score: f1 / 100,
+              prevented_fraud_amount: prev, missed_fraud_amount: (473 - tp) * 123.87,
+              alert_investigation_cost: alertCost, net_financial_benefit: prev - alertCost
+            }));
+          }
+          if (p.startsWith('/api/transaction/')) {
+            return new Response(JSON.stringify({
+              transaction_id: 1, transaction_time: 3600, time_hours: 1.0, transaction_amount: 149.62,
+              class_label: 1, transaction_hash: "hash_001", model_name: model,
+              predicted_probability: 0.9421, predicted_label: 1, threshold_used: 0.70, outcome: "True Positive",
+              top_signals: [{feature: "V14", value: -8.92}, {feature: "V10", value: -6.45}, {feature: "V12", value: -7.12}, {feature: "V4", value: 5.89}]
+            }));
+          }
+        }
+        return originalFetch.apply(this, arguments);
+      };
+    </script>
+    
+<script>
+/**
+ * FinGuard Interactive Analytics Dashboard - Client Application Logic
+ */
+
+// Application State
+const state = {
+  theme: localStorage.getItem('finguard_theme') || 'dark',
+  activeTab: 'overview',
+  filters: {
+    model: 'random_forest',
+    time_band: '',
+    amount_band: '',
+    outcome: '',
+    class_label: '',
+    threshold: 0.70,
+    search: '',
+    page: 1,
+    limit: 15,
+    sort_by: 'transaction_id',
+    sort_dir: 'asc'
+  },
+  charts: {},
+  kpis: null,
+  isLiveServer: true
+};
+
+// DOM Content Loaded Handler
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  initNavigation();
+  initFilterListeners();
+  initSimulatorListeners();
+  initTableListeners();
+  
+  // Initial Fetch & Render
+  loadAllDashboardData();
+  
+  // Set Last Updated Timestamp
+  const tsEl = document.getElementById('lastUpdatedTimestamp');
+  if (tsEl) {
+    tsEl.textContent = new Date().toLocaleString();
+  }
+});
+
+// 1. Theme Management
+function initTheme() {
+  document.documentElement.setAttribute('data-theme', state.theme);
+  const themeToggle = document.getElementById('themeToggleBtn');
+  if (themeToggle) {
+    updateThemeIcon();
+    themeToggle.addEventListener('click', () => {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      localStorage.setItem('finguard_theme', state.theme);
+      updateThemeIcon();
+      updateChartsTheme();
+    });
+  }
+}
+
+function updateThemeIcon() {
+  const icon = document.getElementById('themeIcon');
+  if (icon) {
+    icon.innerHTML = state.theme === 'dark' 
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+}
+
+function updateChartsTheme() {
+  const isDark = state.theme === 'dark';
+  const apexTheme = {
+    mode: isDark ? 'dark' : 'light',
+    palette: 'palette1'
+  };
+  Object.values(state.charts).forEach(chart => {
+    if (chart && typeof chart.updateOptions === 'function') {
+      chart.updateOptions({
+        theme: apexTheme,
+        grid: { borderColor: isDark ? '#243048' : '#e2e8f0' },
+        chart: { background: 'transparent' }
+      });
+    }
+  });
+}
+
+// 2. Navigation Tabs
+function initNavigation() {
+  const tabBtns = document.querySelectorAll('.nav-tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const tabKey = btn.dataset.tab;
+      switchTab(tabKey);
+    });
+  });
+}
+
+function switchTab(tabKey) {
+  state.activeTab = tabKey;
+  document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabKey));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${tabKey}`));
+  
+  // Trigger chart reflow on tab change
+  setTimeout(() => {
+    window.dispatchEvent(new Event('resize'));
+  }, 100);
+}
+
+// 3. Filter Listeners
+function initFilterListeners() {
+  // Model selector radios
+  document.querySelectorAll('.model-radio-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.model-radio-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      state.filters.model = card.dataset.model;
+      state.filters.page = 1;
+      loadAllDashboardData();
+    });
+  });
+
+  // Time Band select
+  const timeBandSelect = document.getElementById('filterTimeBand');
+  if (timeBandSelect) {
+    timeBandSelect.addEventListener('change', (e) => {
+      state.filters.time_band = e.target.value;
+      state.filters.page = 1;
+      loadAllDashboardData();
+    });
+  }
+
+  // Amount Band select
+  const amountBandSelect = document.getElementById('filterAmountBand');
+  if (amountBandSelect) {
+    amountBandSelect.addEventListener('change', (e) => {
+      state.filters.amount_band = e.target.value;
+      state.filters.page = 1;
+      loadAllDashboardData();
+    });
+  }
+
+  // Outcome status select
+  const outcomeSelect = document.getElementById('filterOutcome');
+  if (outcomeSelect) {
+    outcomeSelect.addEventListener('change', (e) => {
+      state.filters.outcome = e.target.value;
+      state.filters.page = 1;
+      loadAllDashboardData();
+    });
+  }
+
+  // Threshold slider (left sidebar)
+  const threshSlider = document.getElementById('filterThresholdSlider');
+  const threshValLabel = document.getElementById('filterThresholdVal');
+  if (threshSlider && threshValLabel) {
+    threshSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      threshValLabel.textContent = val.toFixed(2);
+      state.filters.threshold = val;
+    });
+    threshSlider.addEventListener('change', () => {
+      loadKpis();
+      loadConfusionMatrix();
+    });
+  }
+
+  // Reset filters button
+  const resetBtn = document.getElementById('btnResetFilters');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      state.filters.time_band = '';
+      state.filters.amount_band = '';
+      state.filters.outcome = '';
+      state.filters.class_label = '';
+      state.filters.search = '';
+      state.filters.threshold = 0.70;
+      state.filters.page = 1;
+      
+      if (timeBandSelect) timeBandSelect.value = '';
+      if (amountBandSelect) amountBandSelect.value = '';
+      if (outcomeSelect) outcomeSelect.value = '';
+      if (threshSlider) {
+        threshSlider.value = 0.70;
+        if (threshValLabel) threshValLabel.textContent = '0.70';
+      }
+      const searchInput = document.getElementById('tableSearchInput');
+      if (searchInput) searchInput.value = '';
+      
+      loadAllDashboardData();
+    });
+  }
+}
+
+// 4. What-If Simulator Listeners
+function initSimulatorListeners() {
+  const simSlider = document.getElementById('simThresholdSlider');
+  const simValLabel = document.getElementById('simThresholdVal');
+  const simCostInput = document.getElementById('simAlertCostInput');
+
+  if (simSlider && simValLabel) {
+    simSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      simValLabel.textContent = val.toFixed(2);
+      runSimulation(val, parseFloat(simCostInput ? simCostInput.value : 15.0));
+    });
+  }
+
+  if (simCostInput) {
+    simCostInput.addEventListener('input', (e) => {
+      const cost = parseFloat(e.target.value) || 15.0;
+      const thresh = parseFloat(simSlider ? simSlider.value : 0.70);
+      runSimulation(thresh, cost);
+    });
+  }
+}
+
+// 5. Table Listeners & Actions
+function initTableListeners() {
+  const searchInput = document.getElementById('tableSearchInput');
+  if (searchInput) {
+    let debounceTimer;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        state.filters.search = e.target.value;
+        state.filters.page = 1;
+        loadTransactionsTable();
+      }, 350);
+    });
+  }
+
+  const exportBtn = document.getElementById('btnExportCsv');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      exportTransactionsCsv();
+    });
+  }
+
+  const prevBtn = document.getElementById('btnPrevPage');
+  const nextBtn = document.getElementById('btnNextPage');
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (state.filters.page > 1) {
+        state.filters.page--;
+        loadTransactionsTable();
+      }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      state.filters.page++;
+      loadTransactionsTable();
+    });
+  }
+}
+
+// 6. Data Loading Pipeline
+async function loadAllDashboardData() {
+  await Promise.all([
+    loadKpis(),
+    loadTimeTrendsChart(),
+    loadAmountBandsChart(),
+    loadConfusionMatrix(),
+    loadThresholdTradeoffChart(),
+    loadFeaturesChart(),
+    loadTransactionsTable()
+  ]);
+  
+  // Also run initial simulation with current threshold
+  runSimulation(state.filters.threshold, 15.0);
+}
+
+// API Fetch Helper
+async function fetchApi(endpoint) {
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`Fetch error for ${endpoint}:`, err);
+    return null;
+  }
+}
+
+// 7. Render KPI Cards
+async function loadKpis() {
+  const params = new URLSearchParams({
+    model: state.filters.model,
+    threshold: state.filters.threshold
+  });
+  if (state.filters.time_band) params.append('time_band', state.filters.time_band);
+  if (state.filters.amount_band) params.append('amount_band', state.filters.amount_band);
+  if (state.filters.outcome) params.append('outcome', state.filters.outcome);
+
+  const data = await fetchApi(`/api/kpis?${params.toString()}`);
+  if (!data) return;
+  state.kpis = data;
+
+  // Format Helper
+  const fmtNum = (n) => Number(n).toLocaleString();
+  const fmtCurrency = (n) => `$${Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  // Update KPI Elements
+  setElText('kpiTotalTx', fmtNum(data.total_transactions));
+  setElText('kpiTotalAmount', fmtCurrency(data.total_amount));
+  setElText('kpiAvgAmount', `Avg: ${fmtCurrency(data.avg_amount)}`);
+  setElText('kpiFraudCount', fmtNum(data.fraud_count));
+  setElText('kpiFraudRate', `${data.fraud_rate_pct.toFixed(4)}%`);
+  setElText('kpiFraudAmount', fmtCurrency(data.fraud_amount));
+  
+  setElText('kpiPrecision', `${data.precision_pct.toFixed(2)}%`);
+  setElText('kpiRecall', `${data.recall_pct.toFixed(2)}%`);
+  setElText('kpiF1', data.f1_score.toFixed(4));
+  setElText('kpiFlagged', fmtNum(data.flagged_count));
+  setElText('kpiFlagRate', `${data.flag_rate_pct.toFixed(2)}%`);
+  setElText('kpiPreventedAmount', fmtCurrency(data.prevented_fraud_amount));
+  setElText('kpiMissedAmount', fmtCurrency(data.missed_fraud_amount));
+}
+
+function setElText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+// 8. Render Time Band Trends Chart
+async function loadTimeTrendsChart() {
+  const data = await fetchApi('/api/charts/time_trends');
+  if (!data) return;
+
+  const categories = data.map(d => d.time_band);
+  const txCounts = data.map(d => d.total_transactions);
+  const fraudRates = data.map(d => d.fraud_rate);
+
+  const options = {
+    series: [
+      { name: 'Total Transactions', type: 'column', data: txCounts },
+      { name: 'Fraud Rate (%)', type: 'line', data: fraudRates }
+    ],
+    chart: {
+      height: 290,
+      type: 'line',
+      toolbar: { show: false },
+      background: 'transparent',
+      foreColor: state.theme === 'dark' ? '#94a3b8' : '#475569'
+    },
+    stroke: { width: [0, 3], curve: 'smooth' },
+    colors: ['#6366f1', '#f43f5e'],
+    plotOptions: {
+      bar: { columnWidth: '45%', borderRadius: 4 }
+    },
+    dataLabels: { enabled: false },
+    xaxis: { categories: categories },
+    yaxis: [
+      {
+        title: { text: 'Transactions' },
+        labels: { formatter: (val) => val >= 1000 ? `${(val/1000).toFixed(0)}k` : val }
+      },
+      {
+        opposite: true,
+        title: { text: 'Fraud Rate (%)' },
+        labels: { formatter: (val) => `${val.toFixed(2)}%` }
+      }
+    ],
+    tooltip: {
+      theme: state.theme === 'dark' ? 'dark' : 'light',
+      y: {
+        formatter: (val, opt) => opt.seriesIndex === 0 ? Number(val).toLocaleString() : `${val.toFixed(3)}%`
+      }
+    },
+    grid: { borderColor: state.theme === 'dark' ? '#243048' : '#e2e8f0' }
+  };
+
+  renderApexChart('chartTimeTrends', options);
+}
+
+// 9. Render Amount Band Distribution Chart
+async function loadAmountBandsChart() {
+  const data = await fetchApi('/api/charts/amount_bands');
+  if (!data) return;
+
+  const categories = data.map(d => `$${d.amount_band}`);
+  const fraudCounts = data.map(d => d.fraudulent_transactions);
+  const fraudRates = data.map(d => d.fraud_rate);
+
+  const options = {
+    series: [
+      { name: 'Fraud Cases', type: 'column', data: fraudCounts },
+      { name: 'Fraud Rate (%)', type: 'line', data: fraudRates }
+    ],
+    chart: {
+      height: 290,
+      type: 'line',
+      toolbar: { show: false },
+      background: 'transparent',
+      foreColor: state.theme === 'dark' ? '#94a3b8' : '#475569'
+    },
+    stroke: { width: [0, 3], curve: 'straight' },
+    colors: ['#a855f7', '#f59e0b'],
+    plotOptions: {
+      bar: { columnWidth: '50%', borderRadius: 4 }
+    },
+    xaxis: { categories: categories },
+    yaxis: [
+      { title: { text: 'Fraud Cases' } },
+      {
+        opposite: true,
+        title: { text: 'Risk Concentration (%)' },
+        labels: { formatter: (val) => `${val.toFixed(2)}%` }
+      }
+    ],
+    tooltip: {
+      theme: state.theme === 'dark' ? 'dark' : 'light'
+    },
+    grid: { borderColor: state.theme === 'dark' ? '#243048' : '#e2e8f0' }
+  };
+
+  renderApexChart('chartAmountBands', options);
+}
+
+// 10. Render Confusion Matrix & Outcomes
+async function loadConfusionMatrix() {
+  const data = await fetchApi(`/api/charts/confusion_matrix?model=${state.filters.model}`);
+  if (!data) return;
+
+  const m = data.matrix;
+  setElText('matTP', Number(m.tp).toLocaleString());
+  setElText('matFP', Number(m.fp).toLocaleString());
+  setElText('matFN', Number(m.fn).toLocaleString());
+  setElText('matTN', Number(m.tn).toLocaleString());
+
+  const options = {
+    series: [m.tp, m.fp, m.fn, m.tn],
+    labels: ['True Positives (Caught)', 'False Positives (Alarms)', 'False Negatives (Missed)', 'True Negatives (Cleared)'],
+    chart: {
+      type: 'donut',
+      height: 280,
+      background: 'transparent',
+      foreColor: state.theme === 'dark' ? '#94a3b8' : '#475569'
+    },
+    colors: ['#10b981', '#f59e0b', '#f43f5e', '#0ea5e9'],
+    legend: { position: 'bottom' },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '65%',
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: 'Total Scored',
+              formatter: () => '283,726'
+            }
+          }
+        }
+      }
+    },
+    dataLabels: { enabled: false },
+    tooltip: {
+      theme: state.theme === 'dark' ? 'dark' : 'light'
+    }
+  };
+
+  renderApexChart('chartConfusionDonut', options);
+}
+
+// 11. Render Threshold Trade-off Curve
+async function loadThresholdTradeoffChart() {
+  const data = await fetchApi(`/api/charts/threshold_curve?model=${state.filters.model}`);
+  if (!data) return;
+
+  const thresholds = data.map(d => d.threshold.toFixed(2));
+  const precision = data.map(d => d.precision);
+  const recall = data.map(d => d.recall);
+  const f1 = data.map(d => (d.f1 * 100).toFixed(1));
+
+  const options = {
+    series: [
+      { name: 'Precision (%)', data: precision },
+      { name: 'Recall / Coverage (%)', data: recall },
+      { name: 'F1 Score (x100)', data: f1 }
+    ],
+    chart: {
+      height: 310,
+      type: 'line',
+      toolbar: { show: false },
+      background: 'transparent',
+      foreColor: state.theme === 'dark' ? '#94a3b8' : '#475569'
+    },
+    stroke: { width: 3, curve: 'smooth' },
+    colors: ['#10b981', '#f43f5e', '#6366f1'],
+    xaxis: {
+      categories: thresholds,
+      title: { text: 'Decision Threshold' }
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      title: { text: 'Percentage / Metric Score' }
+    },
+    grid: { borderColor: state.theme === 'dark' ? '#243048' : '#e2e8f0' },
+    tooltip: {
+      theme: state.theme === 'dark' ? 'dark' : 'light',
+      y: { formatter: (val) => `${val}%` }
+    }
+  };
+
+  renderApexChart('chartThresholdCurve', options);
+}
+
+// 12. Render Discriminative Features
+async function loadFeaturesChart() {
+  const data = await fetchApi('/api/charts/features');
+  if (!data) return;
+
+  const features = data.map(d => d.name);
+  const gaps = data.map(d => d.gap);
+
+  const options = {
+    series: [{ name: 'Absolute Separation Gap', data: gaps }],
+    chart: {
+      type: 'bar',
+      height: 300,
+      toolbar: { show: false },
+      background: 'transparent',
+      foreColor: state.theme === 'dark' ? '#94a3b8' : '#475569'
+    },
+    plotOptions: {
+      bar: { horizontal: true, borderRadius: 4, barHeight: '55%' }
+    },
+    colors: ['#6366f1'],
+    dataLabels: { enabled: false },
+    xaxis: {
+      categories: features,
+      title: { text: 'Mean Separation Magnitude' }
+    },
+    grid: { borderColor: state.theme === 'dark' ? '#243048' : '#e2e8f0' },
+    tooltip: {
+      theme: state.theme === 'dark' ? 'dark' : 'light'
+    }
+  };
+
+  renderApexChart('chartFeatures', options);
+}
+
+// 13. Render & Populate Data Table
+async function loadTransactionsTable() {
+  const params = new URLSearchParams({
+    page: state.filters.page,
+    limit: state.filters.limit,
+    model: state.filters.model,
+    sort_by: state.filters.sort_by,
+    sort_dir: state.filters.sort_dir
+  });
+  if (state.filters.search) params.append('search', state.filters.search);
+  if (state.filters.outcome) params.append('outcome', state.filters.outcome);
+  if (state.filters.class_label !== '') params.append('class_label', state.filters.class_label);
+
+  const data = await fetchApi(`/api/transactions?${params.toString()}`);
+  const tbody = document.getElementById('transactionsTableBody');
+  if (!tbody || !data) return;
+
+  tbody.innerHTML = '';
+  const records = data.records || [];
+
+  if (records.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-muted);">No transactions match the selected filters.</td></tr>';
+    return;
+  }
+
+  records.forEach(row => {
+    const tr = document.createElement('tr');
+    
+    let outcomeClass = 'tn';
+    if (row.outcome === 'True Positive') outcomeClass = 'tp';
+    else if (row.outcome === 'False Positive') outcomeClass = 'fp';
+    else if (row.outcome === 'False Negative') outcomeClass = 'fn';
+
+    const isFraud = row.class_label === 1;
+    const fraudBadge = isFraud 
+      ? '<span class="outcome-pill fn">FRAUD (1)</span>' 
+      : '<span style="color:var(--text-muted); font-size:0.75rem;">Legit (0)</span>';
+
+    const probVal = (row.predicted_probability * 100).toFixed(1);
+    const probColor = row.predicted_probability >= 0.70 ? 'var(--color-danger)' : (row.predicted_probability >= 0.30 ? 'var(--color-warning)' : 'var(--text-secondary)');
+
+    tr.innerHTML = `
+      <td><strong>#${row.transaction_id}</strong></td>
+      <td>${row.time_hours}h</td>
+      <td><strong>$${Number(row.transaction_amount).toFixed(2)}</strong></td>
+      <td>${fraudBadge}</td>
+      <td><span style="font-weight:700; color:${probColor}">${probVal}%</span></td>
+      <td><span class="outcome-pill ${outcomeClass}">${row.outcome}</span></td>
+      <td>
+        <button class="pagination-btn" style="padding:0.2rem 0.5rem;" onclick="inspectTransaction(${row.transaction_id})">
+          Inspect
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Update Pagination Controls
+  const p = data.pagination || {};
+  setElText('tablePaginationInfo', `Showing ${((p.page - 1) * p.limit) + 1} - ${Math.min(p.page * p.limit, p.total_records)} of ${Number(p.total_records).toLocaleString()} records`);
+  
+  const prevBtn = document.getElementById('btnPrevPage');
+  const nextBtn = document.getElementById('btnNextPage');
+  if (prevBtn) prevBtn.disabled = !p.has_prev;
+  if (nextBtn) nextBtn.disabled = !p.has_next;
+}
+
+// 14. What-If Simulation Runner
+async function runSimulation(threshold, costPerAlert) {
+  const data = await fetchApi(`/api/simulate?model=${state.filters.model}&threshold=${threshold}&cost=${costPerAlert}`);
+  if (!data) return;
+
+  setElText('simTP', Number(data.true_positives).toLocaleString());
+  setElText('simFP', Number(data.false_positives).toLocaleString());
+  setElText('simFN', Number(data.false_negatives).toLocaleString());
+  setElText('simAlerts', Number(data.flagged_alerts).toLocaleString());
+  setElText('simPrecision', `${data.precision_pct.toFixed(2)}%`);
+  setElText('simRecall', `${data.recall_pct.toFixed(2)}%`);
+  setElText('simPreventedAmt', `$${Number(data.prevented_fraud_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
+  setElText('simInvestigationCost', `$${Number(data.alert_investigation_cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
+  setElText('simNetBenefit', `$${Number(data.net_financial_benefit).toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
+}
+
+// 15. Inspect Transaction Modal
+async function inspectTransaction(txId) {
+  const modal = document.getElementById('inspectModal');
+  const body = document.getElementById('modalContent');
+  if (!modal || !body) return;
+
+  body.innerHTML = '<div style="text-align:center; padding:2rem;"><div class="pulse-dot" style="margin:0 auto 1rem;"></div>Loading transaction features...</div>';
+  modal.classList.add('active');
+
+  const data = await fetchApi(`/api/transaction/${txId}?model=${state.filters.model}`);
+  if (!data || data.error) {
+    body.innerHTML = '<p style="color:var(--color-danger);">Failed to load transaction details.</p>';
+    return;
+  }
+
+  let signalsHtml = (data.top_signals || []).map(s => `
+    <div style="display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid var(--border-subtle); font-size:0.8rem;">
+      <strong>${s.feature}</strong>
+      <span style="font-family:monospace; color:${s.value < 0 ? 'var(--color-danger)' : 'var(--color-info)'}">${s.value}</span>
+    </div>
+  `).join('');
+
+  body.innerHTML = `
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">
+      <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
+        <div style="font-size:0.75rem; color:var(--text-muted);">Transaction ID</div>
+        <div style="font-size:1.1rem; font-weight:700;">#${data.transaction_id}</div>
+      </div>
+      <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
+        <div style="font-size:0.75rem; color:var(--text-muted);">Amount</div>
+        <div style="font-size:1.1rem; font-weight:700; color:var(--accent-primary);">$${Number(data.transaction_amount).toFixed(2)}</div>
+      </div>
+      <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
+        <div style="font-size:0.75rem; color:var(--text-muted);">Actual Ground Truth</div>
+        <div style="font-size:1rem; font-weight:700;">${data.class_label === 1 ? '<span style="color:var(--color-danger);">Fraudulent (1)</span>' : '<span style="color:var(--color-success);">Legitimate (0)</span>'}</div>
+      </div>
+      <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
+        <div style="font-size:0.75rem; color:var(--text-muted);">Model Fraud Probability</div>
+        <div style="font-size:1.1rem; font-weight:800; color:${data.predicted_probability >= 0.70 ? 'var(--color-danger)' : 'var(--color-success)'}">
+          ${(data.predicted_probability * 100).toFixed(2)}%
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h4 style="font-size:0.85rem; text-transform:uppercase; margin-bottom:0.6rem; color:var(--text-secondary);">Top Feature Anomaly Signals</h4>
+      <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
+        ${signalsHtml}
+      </div>
+    </div>
+
+    <div style="font-size:0.72rem; color:var(--text-muted); word-break:break-all;">
+      <strong>SHA-256 Hash:</strong> ${data.transaction_hash}
+    </div>
+  `;
+}
+
+function closeModal() {
+  const modal = document.getElementById('inspectModal');
+  if (modal) modal.classList.remove('active');
+}
+
+// 16. CSV Export Trigger
+function exportTransactionsCsv() {
+  const params = new URLSearchParams({
+    model: state.filters.model
+  });
+  if (state.filters.search) params.append('search', state.filters.search);
+  if (state.filters.outcome) params.append('outcome', state.filters.outcome);
+  if (state.filters.class_label !== '') params.append('class_label', state.filters.class_label);
+
+  window.location.href = `/api/export?${params.toString()}`;
+}
+
+// ApexCharts Helper Wrapper
+function renderApexChart(containerId, options) {
+  const el = document.getElementById(containerId);
+  if (!el || typeof ApexCharts === 'undefined') return;
+
+  if (state.charts[containerId]) {
+    state.charts[containerId].updateOptions(options);
+  } else {
+    state.charts[containerId] = new ApexCharts(el, options);
+    state.charts[containerId].render();
+  }
+}
+
+</script>
+</body>
+</html>

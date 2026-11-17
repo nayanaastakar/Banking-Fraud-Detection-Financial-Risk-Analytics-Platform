@@ -12,6 +12,30 @@
 
 ---
 
+## 🖥️ Interactive Analytics Dashboard (Power BI Edition)
+
+FinGuard features a dedicated **Power BI-inspired Interactive Web Analytics Dashboard** built with Python and modern web technologies. It provides dynamic slicers, live KPI calculations, multi-tab analytical views, a What-If Decision Threshold Simulator, and a live searchable transaction data explorer with record-level inspection and CSV exports.
+
+```powershell
+# Launch the interactive dashboard locally
+python scripts/run_dashboard.py --port 8050 --browser
+```
+
+*Alternatively, open [`reports/interactive_dashboard.html`](reports/interactive_dashboard.html) to run the standalone offline bundle directly in any web browser without running a server.*
+
+- **Header & Controls:** Theme toggle (Light/Dark mode), real-time MySQL live connection badge, navigation tabs.
+- **Power BI Slicers:** Model selector (Random Forest vs Logistic Regression), Time Band slicer (`0-1h`, `1-2h`, `2-3h`, `3h+`), Amount Tier slicer (`$0-$10` to `$1,000+`), Outcome filter, and Decision Threshold slider.
+- **Top KPI Ribbon:** Total volume (`283,726` tx), Gross amount (`$25.10M`), Fraud incidents (`473`), Fraud loss exposure (`$58.59K`), Model Precision (`94.52%`), and Flagged alerts (`483`).
+- **4 Analytical Tabs:**
+  1. *Executive Overview:* Temporal velocity trends, amount risk concentrations, confusion matrix donut, top discriminative PCA features.
+  2. *Risk Patterns:* Financial loss mitigation breakdown (Prevented vs Missed vs Alert cost) and hour-by-hour anomaly spikes.
+  3. *Model Intelligence & What-If Simulator:* Interactive slider to test any decision threshold ($0.10 - 0.95$) and compute net financial benefit in real-time.
+  4. *Data Explorer:* Real-time search, sorting, pagination, CSV download, and record-level PCA signal inspection modal.
+
+👉 **Complete documentation:** [docs/DASHBOARD_GUIDE.md](docs/DASHBOARD_GUIDE.md)
+
+---
+
 ## 🚀 Key Highlights & Accomplishments
 
 - **Robust Data Pipeline & Quality Validation:** Validated raw data integrity across 284,807 rows and 31 features with zero nulls, and engineered behavioral features including transaction velocity time bands and amount risk tiers.
@@ -227,16 +251,19 @@ pytest -q
 
 # Step 7: Generate executive markdown report
 python scripts/generate_reports.py
+
+# Step 8: Launch the interactive analytics dashboard
+python scripts/run_dashboard.py --port 8050 --browser
 ```
 
 ---
 
 ## 🧪 Automated Testing
-All unit tests validate data validation rules, SQL schema constraints, feature engineering logic, target leakage prevention, and model evaluation routines:
+All unit tests validate data validation rules, SQL schema constraints, feature engineering logic, target leakage prevention, model evaluation routines, and dashboard REST APIs:
 ```powershell
 pytest -v
 ```
-**Test Result:** `16 passed in 4.60s` (100% pass rate).
+**Test Result:** `24 passed in 29.0s` (100% pass rate).
 
 ---
 

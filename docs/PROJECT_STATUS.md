@@ -7,7 +7,7 @@
 - Git: initialized and configured
 - MySQL Server: installed and running on localhost:3306 (MySQL80 service active)
 - Kaggle dataset: downloaded and validated at `data/raw/creditcard.csv` (284,807 rows)
-- Automated Test Suite: verified with `pytest -q` (16 passed in 4.60s)
+- Automated Test Suite: verified with `pytest -q` (24 passed in 29.0s)
 
 ## Verified completion status
 
@@ -32,13 +32,17 @@
 - Status: complete and verified
 - Evidence: `scripts/run_model_training.py` trained balanced Logistic Regression and Random Forest classifiers, serialized model artifacts to `models/`, loaded 283,726 predictions per model into MySQL, and saved `reports/model_metrics/model_comparison.csv`.
 
-### 6. Reporting and Executive Brief
+### 6. Interactive Analytics Dashboard (Power BI Inspired)
+- Status: complete and verified
+- Evidence: `scripts/run_dashboard.py` serves a full interactive dashboard with live slicers, KPI ribbon, 4 analytical tabs, What-If decision threshold simulator, and transaction data explorer with inspection modal and CSV export. Standalone offline bundle compiled at `reports/interactive_dashboard.html`.
+
+### 7. Reporting and Executive Brief
 - Status: complete and verified
 - Evidence: `scripts/generate_reports.py` created `reports/executive_summary.md`.
 
-### 7. Automated Test Suite
+### 8. Automated Test Suite
 - Status: complete and verified
-- Evidence: `pytest -v` passed all 16 tests covering data validation, schema logic, feature engineering, and model metrics.
+- Evidence: `pytest -v` passed all 24 tests covering data validation, schema logic, feature engineering, model metrics, and dashboard REST APIs.
 
 ## Verified model metrics
 
