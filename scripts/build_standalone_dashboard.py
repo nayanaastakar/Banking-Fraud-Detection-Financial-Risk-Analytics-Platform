@@ -33,10 +33,12 @@ def build_standalone_dashboard() -> Path:
         "sample_transactions": data_service.get_transactions(page=1, limit=50, model="random_forest"),
     }
 
+    import re
     # Inline CSS
-    standalone_html = html_template.replace(
-        '<link rel="stylesheet" href="/static/css/dashboard.css">',
-        f'<style>\n{css_content}\n</style>'
+    standalone_html = re.sub(
+        r'<link\s+rel="stylesheet"\s+href="/static/css/dashboard\.css(\?[^"]*)?">',
+        f'<style>\n{css_content}\n</style>',
+        html_template
     )
 
     # Preload mock/embedded interceptor script for offline file:// execution
@@ -111,9 +113,10 @@ def build_standalone_dashboard() -> Path:
     """
 
     # Inline JS and offline interceptor
-    standalone_html = standalone_html.replace(
-      '<script src="/static/js/dashboard.js"></script>',
-      f'{offline_interceptor}\n<script>\n{js_content}\n</script>'
+    standalone_html = re.sub(
+        r'<script\s+src="/static/js/dashboard\.js(\?[^"]*)?"></script>',
+        f'{offline_interceptor}\n<script>\n{js_content}\n</script>',
+        standalone_html
     )
 
     out_path = PROJECT_ROOT / "reports" / "interactive_dashboard.html"

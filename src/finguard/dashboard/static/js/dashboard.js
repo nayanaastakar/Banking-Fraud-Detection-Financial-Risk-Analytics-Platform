@@ -626,7 +626,7 @@ async function renderTimeTrendsChart() {
       { name: 'Fraud Rate (%)', type: 'line', data: fraudRates }
     ],
     chart: {
-      height: 290,
+      height: '100%',
       type: 'line',
       toolbar: { show: false },
       background: 'transparent',
@@ -703,7 +703,7 @@ async function renderAmountBandsChart() {
       { name: 'Risk Concentration (%)', type: 'line', data: riskRates }
     ],
     chart: {
-      height: 290,
+      height: '100%',
       type: 'line',
       toolbar: { show: false },
       background: 'transparent',
@@ -767,7 +767,7 @@ async function renderConfusionMatrixChart() {
     labels: ['True Positives (Caught)', 'False Positives (Alarms)', 'False Negatives (Missed)', 'True Negatives (Cleared)'],
     chart: {
       type: 'donut',
-      height: 280,
+      height: '100%',
       background: 'transparent',
       foreColor: isDark ? '#94a3b8' : '#475569',
       events: {
@@ -780,7 +780,7 @@ async function renderConfusionMatrixChart() {
       }
     },
     colors: ['#10b981', '#f59e0b', '#f43f5e', '#0ea5e9'],
-    legend: { position: 'bottom' },
+    legend: { show: false },
     plotOptions: {
       pie: {
         donut: {
@@ -865,7 +865,7 @@ async function renderFeatureImportanceChart() {
     series: [{ name: 'Absolute Separation Gap', data: gaps }],
     chart: {
       type: 'bar',
-      height: 290,
+      height: '100%',
       toolbar: { show: false },
       background: 'transparent',
       foreColor: isDark ? '#94a3b8' : '#475569'
