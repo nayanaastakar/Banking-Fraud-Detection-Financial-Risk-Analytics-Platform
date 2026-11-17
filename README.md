@@ -25,7 +25,6 @@
   - [2. Financial Risk Patterns & Exposure](#2-financial-risk-patterns--exposure)
   - [3. What-If Decision Simulator](#3-what-if-decision-simulator)
   - [4. Transaction Data Explorer](#4-transaction-data-explorer)
-  - [5. Dynamic Power BI-Style Cross-Filtering](#5-dynamic-power-bi-style-cross-filtering)
 - [🚀 Key Features & Capabilities](#-key-features--capabilities)
 - [🛠️ Technology Stack](#️-technology-stack)
 - [🏗️ System Architecture & Data Flow](#️-system-architecture--data-flow)
@@ -76,11 +75,6 @@ Interactive slider enabling fraud risk teams to simulate any decision threshold 
 High-performance searchable transaction ledger with live text searching, column sorting, server-side pagination, CSV data export, and deep PCA feature divergence modals.
 
 ![Transaction Data Explorer](screenshots/04_data_explorer.png)
-
-### 5. Dynamic Power BI-Style Cross-Filtering
-Clicking any chart element (e.g., the *2-3h Peak Surge* window) or toggling sidebar slicers triggers the in-memory OLAP cube to recalculate all 6 KPIs and update all visualizations in sub-milliseconds with an active filter ribbon.
-
-![Dynamic Cross-Filtering](screenshots/05_cross_filtering_interaction.png)
 
 ---
 
@@ -236,8 +230,7 @@ Banking-Fraud-Detection-Financial-Risk-Analytics-Platform/
 │   ├── 01_executive_overview.png       # Executive Overview tab
 │   ├── 02_risk_patterns.png            # Financial Risk Patterns tab
 │   ├── 03_model_simulator.png          # What-If Decision Simulator tab
-│   ├── 04_data_explorer.png            # Transaction Data Explorer tab
-│   └── 05_cross_filtering_interaction.png # Dynamic cross-filtering demonstration
+│   └── 04_data_explorer.png            # Transaction Data Explorer tab
 ├── scripts/
 │   ├── build_standalone_dashboard.py   # Compiles offline standalone HTML report
 │   ├── generate_reports.py             # Generates executive summary documentation
