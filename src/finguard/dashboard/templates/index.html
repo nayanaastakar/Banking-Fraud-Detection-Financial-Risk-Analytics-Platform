@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FinGuard — Banking Fraud Detection & Risk Analytics Dashboard</title>
-  <link rel="stylesheet" href="/static/css/dashboard.css?v=3.1">
+  <link rel="stylesheet" href="/static/css/dashboard.css?v=3.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -74,9 +74,6 @@
         <span class="ts-label">Updated</span>
         <span id="lastUpdatedTimestamp">Just now</span>
       </div>
-      <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Mode">
-        <span id="themeIcon"></span>
-      </button>
     </div>
   </header>
 
@@ -342,6 +339,7 @@
       <section id="tab-risk" class="tab-content">
         <div class="charts-grid-secondary">
           
+          <!-- Financial Risk Exposure & Mitigation -->
           <div class="chart-card">
             <div class="chart-header">
               <div class="chart-title-wrap">
@@ -349,25 +347,43 @@
                 <p>Comparative summary of prevented loss vs missed fraud vs operational alert cost</p>
               </div>
             </div>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; margin-top:0.5rem;">
-              <div style="background:var(--bg-primary); padding:1rem; border-radius:var(--radius-md); border-left:4px solid var(--color-success);">
-                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Prevented Fraud Loss</div>
-                <div style="font-size:1.6rem; font-weight:800; color:var(--color-success); margin:0.25rem 0;" id="riskPreventedVal">$52,717.87</div>
-                <div style="font-size:0.74rem; color:var(--text-secondary);">Direct fraudulent transaction amount blocked by model.</div>
+            <div class="risk-metrics-stack">
+              <div class="risk-stat-item border-success">
+                <div class="risk-stat-meta">
+                  <span class="risk-stat-label">Prevented Fraud Loss</span>
+                  <span class="risk-stat-badge tag-success">Direct Block</span>
+                </div>
+                <div class="risk-stat-val val-success" id="riskPreventedVal">$52,717.87</div>
+                <div class="risk-stat-desc">Fraudulent transaction amount intercepted by threshold rules.</div>
               </div>
-              <div style="background:var(--bg-primary); padding:1rem; border-radius:var(--radius-md); border-left:4px solid var(--color-danger);">
-                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Undetected Fraud Exposure</div>
-                <div style="font-size:1.6rem; font-weight:800; color:var(--color-danger); margin:0.25rem 0;" id="riskMissedVal">$5,873.52</div>
-                <div style="font-size:0.74rem; color:var(--text-secondary);">Residual fraud value slipping past the decision threshold.</div>
+              <div class="risk-stat-item border-danger">
+                <div class="risk-stat-meta">
+                  <span class="risk-stat-label">Undetected Fraud Exposure</span>
+                  <span class="risk-stat-badge tag-danger">Slipped Past</span>
+                </div>
+                <div class="risk-stat-val val-danger" id="riskMissedVal">$5,873.52</div>
+                <div class="risk-stat-desc">Residual fraud volume remaining undetected below alert cutoff.</div>
               </div>
-              <div style="background:var(--bg-primary); padding:1rem; border-radius:var(--radius-md); border-left:4px solid var(--color-secondary-yacht);">
-                <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">False Alarm Friction Amount</div>
-                <div style="font-size:1.6rem; font-weight:800; color:var(--color-secondary-yacht); margin:0.25rem 0;" id="riskFrictionVal">$2,840.10</div>
-                <div style="font-size:0.74rem; color:var(--text-secondary);">Legitimate transaction volume held for secondary investigation.</div>
+              <div class="risk-stat-item border-warning">
+                <div class="risk-stat-meta">
+                  <span class="risk-stat-label">False Alarm Friction Amount</span>
+                  <span class="risk-stat-badge tag-warning">Investigation</span>
+                </div>
+                <div class="risk-stat-val val-warning" id="riskFrictionVal">$2,840.04</div>
+                <div class="risk-stat-desc">Legitimate transaction volume held for manual verification review.</div>
+              </div>
+              <div class="risk-stat-item border-info">
+                <div class="risk-stat-meta">
+                  <span class="risk-stat-label">Net Fraud Capital Defense Rate</span>
+                  <span class="risk-stat-badge tag-info">89.98% Defended</span>
+                </div>
+                <div class="risk-stat-val val-info">$52,717.87 / $58,591.39</div>
+                <div class="risk-stat-desc">High model precision protects financial assets with low friction cost.</div>
               </div>
             </div>
           </div>
 
+          <!-- Temporal Risk Insights -->
           <div class="chart-card">
             <div class="chart-header">
               <div class="chart-title-wrap">
@@ -375,26 +391,35 @@
                 <p>Concentration patterns observed across transaction hours</p>
               </div>
             </div>
-            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0.75rem; margin-top:0.5rem;">
-              <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
-                <div style="font-size:0.72rem; font-weight:700; color:var(--text-muted);">0 - 1 Hour</div>
-                <div style="font-size:1.2rem; font-weight:700; margin:0.2rem 0;">3,931 tx</div>
-                <div style="font-size:0.72rem; color:var(--color-success);">2 frauds (0.05%)</div>
+            <div class="temporal-insights-container">
+              <div class="temporal-cards-grid">
+                <div class="temporal-tile">
+                  <div class="tile-header">0 - 1 Hour</div>
+                  <div class="tile-number">3,931 tx</div>
+                  <div class="tile-sub sub-success">2 frauds (0.05%)</div>
+                </div>
+                <div class="temporal-tile">
+                  <div class="tile-header">1 - 2 Hours</div>
+                  <div class="tile-number">2,213 tx</div>
+                  <div class="tile-sub sub-success">2 frauds (0.09%)</div>
+                </div>
+                <div class="temporal-tile surge-tile">
+                  <div class="tile-header surge-header">2 - 3 Hours (Surge)</div>
+                  <div class="tile-number surge-number">1,573 tx</div>
+                  <div class="tile-sub surge-sub">21 frauds (1.34%)</div>
+                </div>
+                <div class="temporal-tile">
+                  <div class="tile-header">3+ Hours</div>
+                  <div class="tile-number">276,009 tx</div>
+                  <div class="tile-sub sub-warning">448 frauds (0.16%)</div>
+                </div>
               </div>
-              <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
-                <div style="font-size:0.72rem; font-weight:700; color:var(--text-muted);">1 - 2 Hours</div>
-                <div style="font-size:1.2rem; font-weight:700; margin:0.2rem 0;">2,213 tx</div>
-                <div style="font-size:0.72rem; color:var(--color-success);">2 frauds (0.09%)</div>
-              </div>
-              <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px; border:1px solid var(--color-danger);">
-                <div style="font-size:0.72rem; font-weight:700; color:var(--color-danger);">2 - 3 Hours (Surge)</div>
-                <div style="font-size:1.2rem; font-weight:700; margin:0.2rem 0; color:var(--color-danger);">1,573 tx</div>
-                <div style="font-size:0.72rem; color:var(--color-danger); font-weight:700;">21 frauds (1.34%)</div>
-              </div>
-              <div style="background:var(--bg-primary); padding:0.85rem; border-radius:8px;">
-                <div style="font-size:0.72rem; font-weight:700; color:var(--text-muted);">3+ Hours</div>
-                <div style="font-size:1.2rem; font-weight:700; margin:0.2rem 0;">276,009 tx</div>
-                <div style="font-size:0.72rem; color:var(--color-secondary-yacht);">448 frauds (0.16%)</div>
+              <div class="temporal-callout-box">
+                <div class="callout-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  Attack Velocity Alert: Hour 2–3 Surge Window
+                </div>
+                <p class="callout-body">Transactions between hour 2 and 3 exhibit an <strong>8.0× risk surge</strong> (1.34% fraud rate vs 0.16% baseline). Automated stepped authentication is triggered during this window to neutralize coordinated credential stuffing attacks.</p>
               </div>
             </div>
           </div>
@@ -415,11 +440,11 @@
               </div>
             </div>
             
-            <div style="display:flex; flex-direction:column; gap:1rem; margin-top:0.35rem;">
+            <div class="simulator-body">
               <div class="filter-group">
                 <div class="slider-val-badge">
                   <label>Simulated Threshold</label>
-                  <strong id="simThresholdVal" style="font-size:1rem; color:var(--accent-primary);">0.70</strong>
+                  <strong id="simThresholdVal" style="font-size:0.95rem; color:var(--accent-primary);">0.70</strong>
                 </div>
                 <input type="range" id="simThresholdSlider" class="range-slider" min="0.10" max="0.95" step="0.05" value="0.70">
                 <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-muted);">
@@ -434,27 +459,27 @@
               </div>
 
               <!-- Simulation Output Cards -->
-              <div style="background:var(--bg-primary); padding:0.85rem; border-radius:var(--radius-md); display:flex; flex-direction:column; gap:0.5rem;">
-                <div style="display:flex; justify-content:space-between; font-size:0.78rem;">
-                  <span style="color:var(--text-muted);">Flagged Alerts:</span>
-                  <strong id="simFlaggedCount" style="color:var(--text-primary);">483</strong>
+              <div class="sim-outputs-box">
+                <div class="sim-row">
+                  <span class="sim-label">Flagged Alerts:</span>
+                  <strong id="simFlaggedCount" class="sim-val">483</strong>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.78rem;">
-                  <span style="color:var(--text-muted);">Fraud Catch Rate:</span>
-                  <strong id="simCatchRate" style="color:var(--color-success);">94.50%</strong>
+                <div class="sim-row">
+                  <span class="sim-label">Fraud Catch Rate:</span>
+                  <strong id="simCatchRate" class="sim-val text-success">94.50%</strong>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.78rem;">
-                  <span style="color:var(--text-muted);">Prevented Losses:</span>
-                  <strong id="simPreventedLoss" style="color:var(--color-success);">$55,369.89</strong>
+                <div class="sim-row">
+                  <span class="sim-label">Prevented Losses:</span>
+                  <strong id="simPreventedLoss" class="sim-val text-success">$55,369.89</strong>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.78rem;">
-                  <span style="color:var(--text-muted);">Investigation Overhead:</span>
-                  <strong id="simReviewCost" style="color:var(--color-secondary-yacht);">$7,245.00</strong>
+                <div class="sim-row">
+                  <span class="sim-label">Investigation Overhead:</span>
+                  <strong id="simReviewCost" class="sim-val text-warning">$7,245.00</strong>
                 </div>
-                <hr style="border:none; border-top:1px solid var(--border-color); margin:0.25rem 0;">
-                <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
-                  <span style="font-weight:700;">Net Financial Benefit:</span>
-                  <strong id="simNetBenefit" style="font-size:1.05rem; color:var(--color-success);">$48,124.89</strong>
+                <hr class="sim-divider">
+                <div class="sim-row sim-benefit-row">
+                  <span class="sim-benefit-label">Net Financial Benefit:</span>
+                  <strong id="simNetBenefit" class="sim-benefit-val">$48,124.89</strong>
                 </div>
               </div>
             </div>
@@ -541,6 +566,6 @@
   </div>
 
   <!-- Dashboard JavaScript Application -->
-  <script src="/static/js/dashboard.js?v=3.1"></script>
+  <script src="/static/js/dashboard.js?v=3.3"></script>
 </body>
 </html>

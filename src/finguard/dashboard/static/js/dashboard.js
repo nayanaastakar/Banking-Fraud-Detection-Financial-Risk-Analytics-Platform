@@ -201,7 +201,10 @@ function switchTab(tabKey) {
 
   setTimeout(() => {
     window.dispatchEvent(new Event('resize'));
-  }, 80);
+    if (tabKey === 'models') {
+      renderThresholdCurveChart();
+    }
+  }, 60);
 }
 
 // ============================================================================
@@ -824,7 +827,7 @@ async function renderThresholdCurveChart() {
       { name: 'F1 Score (x100)', data: f1 }
     ],
     chart: {
-      height: 310,
+      height: '100%',
       type: 'line',
       toolbar: { show: false },
       background: 'transparent',
