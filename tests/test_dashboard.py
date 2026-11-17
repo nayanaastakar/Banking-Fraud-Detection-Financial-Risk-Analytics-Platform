@@ -55,12 +55,11 @@ def test_dashboard_data_service_threshold_tradeoff():
     assert "threshold" in first_pt
     assert "precision" in first_pt
     assert "recall" in first_pt
-    assert "net_benefit" in first_pt
 
 
 def test_dashboard_data_service_simulation():
     sim = data_service.simulate_threshold(model="random_forest", threshold=0.70, investigation_cost=15.0)
-    assert sim["threshold"] == 0.70
+    assert sim["threshold_tested"] == 0.70
     assert sim["true_positives"] > 0
     assert sim["net_financial_benefit"] > 0
 
@@ -79,3 +78,41 @@ def test_dashboard_data_service_transactions():
     assert "pagination" in res
     assert len(res["records"]) <= 10
     assert res["pagination"]["total_records"] > 0
+
+
+def test_dashboard_olap_cube():
+    cube = data_service.get_olap_cube()
+    assert isinstance(cube, list)
+    assert len(cube) > 0
+    rf_cells = [c for c in cube if c["model_name"] == "random_forest"]
+    assert len(rf_cells) > 0
+    total_tx = sum(c["tx_count"] for c in rf_cells)
+    assert total_tx == 283726
+
+
+def test_dashboard_cross_filtered_kpis():
+    # Filter by 2-3h peak surge
+    filtered_kpis = data_service.get_summary_kpis(
+        model="random_forest",
+        time_band="2-3h",
+        amount_band="0-10"
+    )
+    assert filtered_kpis["is_filtered"] is True
+    assert filtered_kpis["total_transactions"] < 283726
+    assert filtered_kpis["total_transactions"] > 0
+    assert filtered_kpis["fraud_count"] > 0
+
+
+def test_dashboard_filtered_transactions():
+    res = data_service.get_transactions(
+        page=1,
+        limit=15,
+        model="random_forest",
+        time_band="2-3h",
+        outcome="True Positive"
+    )
+    assert "records" in res
+    records = res["records"]
+    for r in records:
+        assert r["outcome"] == "True Positive"
+        assert r["time_hours"] >= 2.0 and r["time_hours"] < 3.0

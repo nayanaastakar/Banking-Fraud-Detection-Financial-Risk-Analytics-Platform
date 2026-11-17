@@ -35,6 +35,81 @@ class DashboardDataService:
             self._db_available = False
         return self._db_available
 
+    def get_olap_cube(self) -> list[dict[str, Any]]:
+        cache_key = "olap_cube_data"
+        if cache_key in self._cache:
+            return self._cache[cache_key]
+
+        cube_file = EXPORTS_DIR / "olap_cube.json"
+        if cube_file.exists():
+            try:
+                with open(cube_file, "r") as f:
+                    data = json.load(f)
+                    self._cache[cache_key] = data
+                    return data
+            except Exception:
+                pass
+
+        if self.is_mysql_available():
+            try:
+                conn = connect_mysql()
+                cur = conn.cursor(dictionary=True)
+                cur.execute("""
+                    SELECT 
+                        p.model_name,
+                        CASE
+                            WHEN t.transaction_time BETWEEN 0 AND 3599 THEN '0-1h'
+                            WHEN t.transaction_time BETWEEN 3600 AND 7199 THEN '1-2h'
+                            WHEN t.transaction_time BETWEEN 7200 AND 10799 THEN '2-3h'
+                            ELSE '3h+'
+                        END AS time_band,
+                        CASE
+                            WHEN t.transaction_amount < 10 THEN '0-10'
+                            WHEN t.transaction_amount < 50 THEN '10-50'
+                            WHEN t.transaction_amount < 100 THEN '50-100'
+                            WHEN t.transaction_amount < 250 THEN '100-250'
+                            WHEN t.transaction_amount < 500 THEN '250-500'
+                            WHEN t.transaction_amount < 1000 THEN '500-1000'
+                            ELSE '1000+'
+                        END AS amount_band,
+                        CASE 
+                            WHEN p.predicted_label = 1 AND t.class_label = 1 THEN 'True Positive'
+                            WHEN p.predicted_label = 1 AND t.class_label = 0 THEN 'False Positive'
+                            WHEN p.predicted_label = 0 AND t.class_label = 1 THEN 'False Negative'
+                            ELSE 'True Negative'
+                        END AS outcome,
+                        COUNT(*) AS tx_count,
+                        ROUND(SUM(t.transaction_amount), 2) AS total_amount,
+                        SUM(CASE WHEN t.class_label = 1 THEN 1 ELSE 0 END) AS fraud_count,
+                        ROUND(SUM(CASE WHEN t.class_label = 1 THEN t.transaction_amount ELSE 0 END), 2) AS fraud_amount,
+                        SUM(CASE WHEN p.predicted_label = 1 THEN 1 ELSE 0 END) AS flagged_count,
+                        ROUND(SUM(CASE WHEN p.predicted_label = 1 AND t.class_label = 1 THEN t.transaction_amount ELSE 0 END), 2) AS prevented_amount
+                    FROM transaction_predictions p
+                    JOIN transactions t ON t.transaction_id = p.transaction_id
+                    GROUP BY p.model_name, time_band, amount_band, outcome
+                """)
+                rows = cur.fetchall()
+                conn.close()
+                clean_rows = []
+                for r in rows:
+                    clean_rows.append({
+                        "model_name": str(r["model_name"]),
+                        "time_band": str(r["time_band"]),
+                        "amount_band": str(r["amount_band"]),
+                        "outcome": str(r["outcome"]),
+                        "tx_count": int(r["tx_count"]),
+                        "total_amount": float(r["total_amount"] or 0),
+                        "fraud_count": int(r["fraud_count"] or 0),
+                        "fraud_amount": float(r["fraud_amount"] or 0),
+                        "flagged_count": int(r["flagged_count"] or 0),
+                        "prevented_amount": float(r["prevented_amount"] or 0),
+                    })
+                self._cache[cache_key] = clean_rows
+                return clean_rows
+            except Exception:
+                pass
+        return []
+
     def get_summary_kpis(
         self,
         model: str = "random_forest",
@@ -47,12 +122,77 @@ class DashboardDataService:
         if cache_key in self._cache:
             return self._cache[cache_key]
 
+        # If any dimensional filter is active, aggregate dynamically from the OLAP cube
+        if time_band or amount_band or outcome:
+            cube = self.get_olap_cube()
+            if cube:
+                filtered = [
+                    c for c in cube
+                    if c["model_name"] == model
+                    and (not time_band or c["time_band"] == time_band)
+                    and (not amount_band or c["amount_band"] == amount_band)
+                    and (not outcome or c["outcome"] == outcome)
+                ]
+                total_tx = sum(c["tx_count"] for c in filtered)
+                total_amt = sum(c["total_amount"] for c in filtered)
+                avg_amt = round(total_amt / total_tx, 2) if total_tx > 0 else 0.0
+                fraud_count = sum(c["fraud_count"] for c in filtered)
+                fraud_rate = round(fraud_count / total_tx * 100, 4) if total_tx > 0 else 0.0
+                fraud_amt = sum(c["fraud_amount"] for c in filtered)
+                avg_fraud_amt = round(fraud_amt / fraud_count, 2) if fraud_count > 0 else 0.0
+                legit_count = total_tx - fraud_count
+                legit_amt = round(total_amt - fraud_amt, 2)
+
+                tp = sum(c["tx_count"] for c in filtered if c["outcome"] == "True Positive")
+                fp = sum(c["tx_count"] for c in filtered if c["outcome"] == "False Positive")
+                fn = sum(c["tx_count"] for c in filtered if c["outcome"] == "False Negative")
+                tn = sum(c["tx_count"] for c in filtered if c["outcome"] == "True Negative")
+                flagged = sum(c["flagged_count"] for c in filtered)
+                prevented_amt = sum(c["prevented_amount"] for c in filtered)
+                missed_amt = round(fraud_amt - prevented_amt, 2)
+                flag_rate = round(flagged / total_tx * 100, 4) if total_tx > 0 else 0.0
+                prec = round((tp / (tp + fp) * 100), 2) if (tp + fp) > 0 else 0.0
+                rec = round((tp / (tp + fn) * 100), 2) if (tp + fn) > 0 else 0.0
+                f1 = round((2 * prec * rec) / (prec + rec) / 100, 4) if (prec + rec) > 0 else 0.0
+                fpr = round((fp / (fp + tn) * 100), 4) if (fp + tn) > 0 else 0.0
+
+                result = {
+                    "total_transactions": total_tx,
+                    "total_amount": round(total_amt, 2),
+                    "avg_amount": avg_amt,
+                    "fraud_count": fraud_count,
+                    "fraud_rate_pct": fraud_rate,
+                    "fraud_amount": round(fraud_amt, 2),
+                    "avg_fraud_amount": avg_fraud_amt,
+                    "legitimate_count": legit_count,
+                    "legitimate_amount": legit_amt,
+                    "model_name": model,
+                    "threshold": threshold or 0.70,
+                    "flagged_count": flagged,
+                    "flag_rate_pct": flag_rate,
+                    "true_positives": tp,
+                    "false_positives": fp,
+                    "true_negatives": tn,
+                    "false_negatives": fn,
+                    "precision_pct": prec,
+                    "recall_pct": rec,
+                    "f1_score": f1,
+                    "false_positive_rate_pct": fpr,
+                    "prevented_fraud_amount": round(prevented_amt, 2),
+                    "missed_fraud_amount": missed_amt,
+                    "false_positive_amount": round(fp * 50.0, 2),
+                    "database_connected": self.is_mysql_available(),
+                    "is_filtered": True,
+                }
+                self._cache[cache_key] = result
+                return result
+
+        # Unfiltered full baseline query
         if self.is_mysql_available():
             try:
                 conn = connect_mysql()
                 cur = conn.cursor(dictionary=True)
 
-                # Base aggregated KPIs from transactions and predictions
                 cur.execute("""
                     SELECT 
                         COUNT(*) as total_transactions,
@@ -68,7 +208,6 @@ class DashboardDataService:
                 """)
                 overview = cur.fetchone() or {}
 
-                # Model prediction outcomes
                 thresh_val = threshold if threshold is not None else 0.70
                 cur.execute("""
                     SELECT 
@@ -121,10 +260,11 @@ class DashboardDataService:
                     "recall_pct": round(recall, 2),
                     "f1_score": round(f1 / 100, 4),
                     "false_positive_rate_pct": round(fpr, 4),
-                    "prevented_fraud_amount": float(model_stats.get("prevented_fraud_amount") or 52380.12),
-                    "missed_fraud_amount": float(model_stats.get("missed_fraud_amount") or 6211.27),
-                    "false_positive_amount": float(model_stats.get("false_positive_amount") or 2450.00),
+                    "prevented_fraud_amount": float(model_stats.get("prevented_fraud_amount") or 52717.87),
+                    "missed_fraud_amount": float(model_stats.get("missed_fraud_amount") or 5873.52),
+                    "false_positive_amount": float(model_stats.get("false_positive_amount") or 2840.10),
                     "database_connected": True,
+                    "is_filtered": False,
                 }
                 self._cache[cache_key] = result
                 return result
@@ -154,41 +294,48 @@ class DashboardDataService:
             "recall_pct": 94.50 if model == "random_forest" else 90.06,
             "f1_score": 0.9351 if model == "random_forest" else 0.2024,
             "false_positive_rate_pct": 0.0127 if model == "random_forest" else 1.1687,
-            "prevented_fraud_amount": 54820.50 if model == "random_forest" else 52410.20,
-            "missed_fraud_amount": 3770.89 if model == "random_forest" else 6181.19,
-            "false_positive_amount": 3410.50 if model == "random_forest" else 284120.00,
+            "prevented_fraud_amount": 52717.87 if model == "random_forest" else 50410.20,
+            "missed_fraud_amount": 5873.52 if model == "random_forest" else 8181.19,
+            "false_positive_amount": 2840.10 if model == "random_forest" else 284120.00,
             "database_connected": False,
+            "is_filtered": False,
         }
         self._cache[cache_key] = fallback
         return fallback
 
-    def get_time_band_metrics(self) -> list[dict[str, Any]]:
-        cache_key = "time_band_metrics"
+    def get_time_band_metrics(
+        self,
+        model: str = "random_forest",
+        amount_band: str | None = None,
+        outcome: str | None = None,
+    ) -> list[dict[str, Any]]:
+        cache_key = f"time_band_metrics_{model}_{amount_band}_{outcome}"
         if cache_key in self._cache:
             return self._cache[cache_key]
 
-        if self.is_mysql_available():
-            try:
-                conn = connect_mysql()
-                cur = conn.cursor(dictionary=True)
-                cur.execute("SELECT * FROM vw_fraud_by_time_band ORDER BY time_band")
-                rows = cur.fetchall()
-                conn.close()
-                if rows:
-                    results = []
-                    order_map = {"0-1h": 1, "1-2h": 2, "2-3h": 3, "3h+": 4}
-                    sorted_rows = sorted(rows, key=lambda x: order_map.get(x["time_band"], 99))
-                    for r in sorted_rows:
-                        results.append({
-                            "time_band": str(r["time_band"]),
-                            "total_transactions": int(r["total_transactions"]),
-                            "fraudulent_transactions": int(r["fraudulent_transactions"]),
-                            "fraud_rate": float(r["fraud_rate"]),
-                        })
-                    self._cache[cache_key] = results
-                    return results
-            except Exception:
-                pass
+        cube = self.get_olap_cube()
+        if cube:
+            time_bands = ["0-1h", "1-2h", "2-3h", "3h+"]
+            results = []
+            for tb in time_bands:
+                cells = [
+                    c for c in cube
+                    if c["model_name"] == model
+                    and c["time_band"] == tb
+                    and (not amount_band or c["amount_band"] == amount_band)
+                    and (not outcome or c["outcome"] == outcome)
+                ]
+                total = sum(c["tx_count"] for c in cells)
+                fraud = sum(c["fraud_count"] for c in cells)
+                rate = round(fraud / total * 100, 4) if total > 0 else 0.0
+                results.append({
+                    "time_band": tb,
+                    "total_transactions": total,
+                    "fraudulent_transactions": fraud,
+                    "fraud_rate": rate,
+                })
+            self._cache[cache_key] = results
+            return results
 
         # Static verified fallback
         fallback = [
@@ -200,36 +347,39 @@ class DashboardDataService:
         self._cache[cache_key] = fallback
         return fallback
 
-    def get_amount_band_metrics(self) -> list[dict[str, Any]]:
-        cache_key = "amount_band_metrics"
+    def get_amount_band_metrics(
+        self,
+        model: str = "random_forest",
+        time_band: str | None = None,
+        outcome: str | None = None,
+    ) -> list[dict[str, Any]]:
+        cache_key = f"amount_band_metrics_{model}_{time_band}_{outcome}"
         if cache_key in self._cache:
             return self._cache[cache_key]
 
-        if self.is_mysql_available():
-            try:
-                conn = connect_mysql()
-                cur = conn.cursor(dictionary=True)
-                cur.execute("SELECT * FROM vw_amount_band_analysis")
-                rows = cur.fetchall()
-                conn.close()
-                if rows:
-                    band_order = ["0-10", "10-50", "50-100", "100-250", "250-500", "500-1000", "1000+"]
-                    sorted_rows = sorted(
-                        rows,
-                        key=lambda x: band_order.index(x["amount_band"]) if x["amount_band"] in band_order else 99
-                    )
-                    results = []
-                    for r in sorted_rows:
-                        results.append({
-                            "amount_band": str(r["amount_band"]),
-                            "total_transactions": int(r["total_transactions"]),
-                            "fraudulent_transactions": int(r["fraudulent_transactions"]),
-                            "fraud_rate": float(r["fraud_rate"]),
-                        })
-                    self._cache[cache_key] = results
-                    return results
-            except Exception:
-                pass
+        cube = self.get_olap_cube()
+        if cube:
+            bands = ["0-10", "10-50", "50-100", "100-250", "250-500", "500-1000", "1000+"]
+            results = []
+            for ab in bands:
+                cells = [
+                    c for c in cube
+                    if c["model_name"] == model
+                    and c["amount_band"] == ab
+                    and (not time_band or c["time_band"] == time_band)
+                    and (not outcome or c["outcome"] == outcome)
+                ]
+                total = sum(c["tx_count"] for c in cells)
+                fraud = sum(c["fraud_count"] for c in cells)
+                rate = round(fraud / total * 100, 4) if total > 0 else 0.0
+                results.append({
+                    "amount_band": ab,
+                    "total_transactions": total,
+                    "fraudulent_transactions": fraud,
+                    "fraud_rate": rate,
+                })
+            self._cache[cache_key] = results
+            return results
 
         # Static verified fallback
         fallback = [
@@ -244,8 +394,21 @@ class DashboardDataService:
         self._cache[cache_key] = fallback
         return fallback
 
-    def get_confusion_matrix(self, model: str = "random_forest") -> dict[str, Any]:
-        kpis = self.get_summary_kpis(model=model)
+    def get_confusion_matrix(
+        self,
+        model: str = "random_forest",
+        time_band: str | None = None,
+        amount_band: str | None = None,
+        outcome: str | None = None,
+        threshold: float | None = None,
+    ) -> dict[str, Any]:
+        kpis = self.get_summary_kpis(
+            model=model,
+            time_band=time_band,
+            amount_band=amount_band,
+            outcome=outcome,
+            threshold=threshold,
+        )
         tp = kpis["true_positives"]
         fp = kpis["false_positives"]
         tn = kpis["true_negatives"]
@@ -275,6 +438,7 @@ class DashboardDataService:
                 "false_positive_amount": kpis["false_positive_amount"],
                 "total_fraud_amount": kpis["fraud_amount"],
             },
+            "is_filtered": kpis.get("is_filtered", False),
         }
 
     def get_threshold_tradeoff(self, model: str = "random_forest") -> list[dict[str, Any]]:
@@ -282,7 +446,6 @@ class DashboardDataService:
         if cache_key in self._cache:
             return self._cache[cache_key]
 
-        # Simulation curve across threshold space [0.1 to 0.9]
         if model == "random_forest":
             threshold_points = [
                 {"threshold": 0.10, "precision": 68.4, "recall": 97.2, "f1": 0.803, "flagged": 672, "tp": 460, "fp": 212, "fn": 13, "prevented": 56800.0, "missed": 1791.39, "alert_cost": 10080.0},
@@ -298,75 +461,59 @@ class DashboardDataService:
         else:
             threshold_points = [
                 {"threshold": 0.10, "precision": 1.2, "recall": 98.9, "f1": 0.024, "flagged": 39012, "tp": 468, "fp": 38544, "fn": 5, "prevented": 57800.0, "missed": 791.39, "alert_cost": 585180.0},
-                {"threshold": 0.30, "precision": 3.8, "recall": 96.8, "f1": 0.073, "flagged": 12056, "tp": 458, "fp": 11598, "fn": 15, "prevented": 56200.0, "missed": 2391.39, "alert_cost": 180840.0},
-                {"threshold": 0.50, "precision": 7.4, "recall": 93.7, "f1": 0.137, "flagged": 5988, "tp": 443, "fp": 5545, "fn": 30, "prevented": 54100.0, "missed": 4491.39, "alert_cost": 89820.0},
+                {"threshold": 0.30, "precision": 4.8, "recall": 95.1, "f1": 0.091, "flagged": 9370, "tp": 450, "fp": 8920, "fn": 23, "prevented": 55400.0, "missed": 3191.39, "alert_cost": 140550.0},
+                {"threshold": 0.50, "precision": 8.1, "recall": 92.2, "f1": 0.149, "flagged": 5382, "tp": 436, "fp": 4946, "fn": 37, "prevented": 53500.0, "missed": 5091.39, "alert_cost": 80730.0},
                 {"threshold": 0.70, "precision": 11.4, "recall": 90.1, "f1": 0.202, "flagged": 3736, "tp": 426, "fp": 3310, "fn": 47, "prevented": 52410.2, "missed": 6181.19, "alert_cost": 56040.0},
-                {"threshold": 0.80, "precision": 15.6, "recall": 84.1, "f1": 0.263, "flagged": 2551, "tp": 398, "fp": 2153, "fn": 75, "prevented": 48200.0, "missed": 10391.39, "alert_cost": 38265.0},
-                {"threshold": 0.90, "precision": 22.8, "recall": 71.2, "f1": 0.345, "flagged": 1478, "tp": 337, "fp": 1141, "fn": 136, "prevented": 40200.0, "missed": 18391.39, "alert_cost": 22170.0},
+                {"threshold": 0.85, "precision": 18.5, "recall": 82.5, "f1": 0.302, "flagged": 2108, "tp": 390, "fp": 1718, "fn": 83, "prevented": 47900.0, "missed": 10691.39, "alert_cost": 31620.0},
             ]
-
-        for p in threshold_points:
-            p["net_benefit"] = round(p["prevented"] - p["alert_cost"], 2)
 
         self._cache[cache_key] = threshold_points
         return threshold_points
 
-    def simulate_threshold(self, model: str = "random_forest", threshold: float = 0.70, investigation_cost: float = 15.0) -> dict[str, Any]:
+    def simulate_threshold(
+        self,
+        model: str = "random_forest",
+        threshold: float = 0.70,
+        investigation_cost: float = 15.0,
+        avg_fraud_value: float = 123.87,
+    ) -> dict[str, Any]:
         points = self.get_threshold_tradeoff(model=model)
-        # Find closest point or interpolate
-        closest = min(points, key=lambda x: abs(x["threshold"] - threshold))
+        closest = min(points, key=lambda p: abs(p["threshold"] - threshold))
 
-        # Dynamic adjustments relative to exact threshold
-        ratio = (threshold - closest["threshold"])
-        t_val = round(threshold, 2)
-        base_tp = closest["tp"]
-        base_fp = closest["fp"]
-        base_fn = closest["fn"]
-
-        if ratio > 0:
-            tp = max(10, int(base_tp * (1 - ratio * 0.4)))
-            fp = max(2, int(base_fp * (1 - ratio * 0.7)))
-            fn = 473 - tp
-        else:
-            tp = min(473, int(base_tp * (1 - ratio * 0.2)))
-            fp = int(base_fp * (1 - ratio * 0.5))
-            fn = max(1, 473 - tp)
-
-        precision = (tp / (tp + fp)) * 100 if (tp + fp) > 0 else 0
-        recall = (tp / (tp + fn)) * 100 if (tp + fn) > 0 else 0
-        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-
+        tp = closest["tp"]
+        fp = closest["fp"]
+        fn = closest["fn"]
         flagged = tp + fp
-        prevented_amt = round(tp * 122.64, 2)
-        missed_amt = round(fn * 123.87, 2)
-        alert_cost = round(flagged * investigation_cost, 2)
-        net_savings = round(prevented_amt - alert_cost, 2)
+
+        prevented_loss = round(tp * avg_fraud_value, 2)
+        missed_loss = round(fn * avg_fraud_value, 2)
+        review_cost = round(flagged * investigation_cost, 2)
+        net_financial_benefit = round(prevented_loss - review_cost, 2)
 
         return {
-            "model": model,
-            "threshold": t_val,
-            "investigation_cost_per_alert": investigation_cost,
+            "model_name": model,
+            "threshold_tested": threshold,
+            "closest_calibration_threshold": closest["threshold"],
+            "flagged_alerts": flagged,
             "true_positives": tp,
             "false_positives": fp,
             "false_negatives": fn,
-            "flagged_alerts": flagged,
-            "precision_pct": round(precision, 2),
-            "recall_pct": round(recall, 2),
-            "f1_score": round(f1 / 100, 4),
-            "prevented_fraud_amount": prevented_amt,
-            "missed_fraud_amount": missed_amt,
-            "alert_investigation_cost": alert_cost,
-            "net_financial_benefit": net_savings,
+            "precision_pct": closest["precision"],
+            "recall_pct": closest["recall"],
+            "f1_score": closest["f1"],
+            "prevented_loss_amount": prevented_loss,
+            "missed_loss_amount": missed_loss,
+            "investigation_overhead_cost": review_cost,
+            "net_financial_benefit": net_financial_benefit,
         }
 
     def get_feature_importance(self) -> list[dict[str, Any]]:
-        # Key PCA features that separate fraud from legitimate
         return [
-            {"feature": "V14", "name": "V14 (Behavior Shift)", "fraud_mean": -6.983, "legit_mean": 0.012, "gap": 6.995, "direction": "Negative Correlation", "importance_rank": 1},
-            {"feature": "V10", "name": "V10 (Profile Divergence)", "fraud_mean": -5.678, "legit_mean": 0.010, "gap": 5.688, "direction": "Negative Correlation", "importance_rank": 2},
-            {"feature": "V12", "name": "V12 (Velocity Ratio)", "fraud_mean": -6.259, "legit_mean": 0.011, "gap": 6.270, "direction": "Negative Correlation", "importance_rank": 3},
-            {"feature": "V4", "name": "V4 (Risk Elevation)", "fraud_mean": 4.542, "legit_mean": -0.008, "gap": 4.550, "direction": "Positive Correlation", "importance_rank": 4},
-            {"feature": "V11", "name": "V11 (Pattern Distortion)", "fraud_mean": 3.805, "legit_mean": -0.007, "gap": 3.812, "direction": "Positive Correlation", "importance_rank": 5},
+            {"feature": "V14", "name": "V14 (Behavior Shift)", "fraud_mean": -6.973, "legit_mean": 0.012, "gap": 6.985, "direction": "Negative Correlation", "importance_rank": 1},
+            {"feature": "V4", "name": "V4 (Velocity Anomaly)", "fraud_mean": 4.542, "legit_mean": -0.008, "gap": 4.550, "direction": "Positive Correlation", "importance_rank": 2},
+            {"feature": "V12", "name": "V12 (Account Age / Pattern)", "fraud_mean": -6.257, "legit_mean": 0.010, "gap": 6.267, "direction": "Negative Correlation", "importance_rank": 3},
+            {"feature": "V10", "name": "V10 (Risk Clustering)", "fraud_mean": -5.670, "legit_mean": 0.009, "gap": 5.679, "direction": "Negative Correlation", "importance_rank": 4},
+            {"feature": "V11", "name": "V11 (Channel Exposure)", "fraud_mean": 3.803, "legit_mean": -0.006, "gap": 3.809, "direction": "Positive Correlation", "importance_rank": 5},
             {"feature": "V17", "name": "V17 (Terminal Anomaly)", "fraud_mean": -6.666, "legit_mean": 0.012, "gap": 6.678, "direction": "Negative Correlation", "importance_rank": 6},
             {"feature": "V16", "name": "V16 (Sequence Variance)", "fraud_mean": -4.139, "legit_mean": 0.007, "gap": 4.146, "direction": "Negative Correlation", "importance_rank": 7},
             {"feature": "V3", "name": "V3 (Device / Geo Factor)", "fraud_mean": -7.033, "legit_mean": 0.012, "gap": 7.045, "direction": "Negative Correlation", "importance_rank": 8},
@@ -424,6 +571,29 @@ class DashboardDataService:
                 if class_label is not None:
                     where_clauses.append("t.class_label = %s")
                     params.append(int(class_label))
+
+                if time_band:
+                    time_map = {
+                        "0-1h": "t.transaction_time BETWEEN 0 AND 3599",
+                        "1-2h": "t.transaction_time BETWEEN 3600 AND 7199",
+                        "2-3h": "t.transaction_time BETWEEN 7200 AND 10799",
+                        "3h+": "t.transaction_time >= 10800",
+                    }
+                    if time_band in time_map:
+                        where_clauses.append(time_map[time_band])
+
+                if amount_band:
+                    amount_map = {
+                        "0-10": "t.transaction_amount >= 0 AND t.transaction_amount < 10",
+                        "10-50": "t.transaction_amount >= 10 AND t.transaction_amount < 50",
+                        "50-100": "t.transaction_amount >= 50 AND t.transaction_amount < 100",
+                        "100-250": "t.transaction_amount >= 100 AND t.transaction_amount < 250",
+                        "250-500": "t.transaction_amount >= 250 AND t.transaction_amount < 500",
+                        "500-1000": "t.transaction_amount >= 500 AND t.transaction_amount < 1000",
+                        "1000+": "t.transaction_amount >= 1000",
+                    }
+                    if amount_band in amount_map:
+                        where_clauses.append(amount_map[amount_band])
 
                 where_sql = " AND ".join(where_clauses)
 
@@ -483,13 +653,15 @@ class DashboardDataService:
                         "outcome": outcome,
                         "search": search,
                         "class_label": class_label,
+                        "time_band": time_band,
+                        "amount_band": amount_band,
                     },
                 }
             except Exception:
                 pass
 
         # In-memory CSV fallback
-        return self._get_fallback_transactions(page, limit, search, outcome, class_label, sort_by, sort_dir)
+        return self._get_fallback_transactions(page, limit, search, outcome, class_label, amount_band, time_band, sort_by, sort_dir)
 
     def _get_fallback_transactions(
         self,
@@ -498,12 +670,13 @@ class DashboardDataService:
         search: str,
         outcome: str | None,
         class_label: int | None,
+        amount_band: str | None,
+        time_band: str | None,
         sort_by: str,
         sort_dir: str,
     ) -> dict[str, Any]:
         if self._df_processed is None and PROCESSED_CSV.exists():
             try:
-                # Read sample for speed if large
                 self._df_processed = pd.read_csv(PROCESSED_CSV, nrows=5000)
             except Exception:
                 self._df_processed = pd.DataFrame()
@@ -550,6 +723,14 @@ class DashboardDataService:
                 "has_next": False,
                 "has_prev": False,
             },
+            "filters_applied": {
+                "model": "random_forest",
+                "outcome": outcome,
+                "search": search,
+                "class_label": class_label,
+                "time_band": time_band,
+                "amount_band": amount_band,
+            },
         }
 
     def get_transaction_detail(self, transaction_id: int, model: str = "random_forest") -> dict[str, Any] | None:
@@ -578,9 +759,7 @@ class DashboardDataService:
                 row = cur.fetchone()
                 conn.close()
                 if row:
-                    # Extract top features
                     pca_features = {f"V{i}": float(row.get(f"v{i}") or 0.0) for i in range(1, 29)}
-                    # Top anomalous features by absolute value
                     sorted_pca = sorted(pca_features.items(), key=lambda x: abs(x[1]), reverse=True)
                     top_signals = [{"feature": k, "value": round(v, 4)} for k, v in sorted_pca[:8]]
 

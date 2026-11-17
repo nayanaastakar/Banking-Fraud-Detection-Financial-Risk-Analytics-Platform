@@ -20,6 +20,7 @@ def build_standalone_dashboard() -> Path:
 
     # Fetch precomputed initial datasets to embed
     embedded_data = {
+        "olap_cube": data_service.get_olap_cube(),
         "kpis_rf": data_service.get_summary_kpis(model="random_forest"),
         "kpis_lr": data_service.get_summary_kpis(model="logistic_regression"),
         "time_trends": data_service.get_time_band_metrics(),
@@ -52,6 +53,9 @@ def build_standalone_dashboard() -> Path:
           const q = u.searchParams;
           const model = q.get('model') || 'random_forest';
           
+          if (p === '/api/olap_cube') {{
+            return new Response(JSON.stringify(window.EMBEDDED_DASHBOARD_DATA.olap_cube || []));
+          }}
           if (p === '/api/kpis') {{
             return new Response(JSON.stringify(model === 'random_forest' ? window.EMBEDDED_DASHBOARD_DATA.kpis_rf : window.EMBEDDED_DASHBOARD_DATA.kpis_lr));
           }}
