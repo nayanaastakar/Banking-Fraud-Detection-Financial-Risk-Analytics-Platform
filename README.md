@@ -59,7 +59,7 @@ The platform includes a dedicated, responsive desktop analytics dashboard config
 ### 1. Executive Overview
 Comprehensive view displaying the single-row 6 KPI ribbon and balanced 2×2 analytical visualizations (Temporal Fraud Velocity, Classification Outcomes donut with confusion matrix pills, Amount Risk Tiers, and Top Discriminative PCA Signals).
 
-![Executive Overview](screenshots/01_executive_overview.png)
+![Executive Overview](screenshots/01_executive_overview_dashboard.png)
 
 ### 2. Financial Risk Patterns & Exposure
 Quantifies financial loss mitigation, residual undetected fraud exposure, and investigation friction side-by-side with hour-by-hour attack concentration patterns and automated surge velocity alerts.
@@ -227,7 +227,7 @@ Banking-Fraud-Detection-Financial-Risk-Analytics-Platform/
 │   ├── executive_summary.md            # Stakeholder executive brief
 │   └── interactive_dashboard.html      # Standalone compiled offline dashboard bundle
 ├── screenshots/
-│   ├── 01_executive_overview.png       # Executive Overview tab
+│   ├── 01_executive_overview_dashboard.png # Executive Overview tab
 │   ├── 02_risk_patterns.png            # Financial Risk Patterns tab
 │   ├── 03_model_simulator.png          # What-If Decision Simulator tab
 │   └── 04_data_explorer.png            # Transaction Data Explorer tab
